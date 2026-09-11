@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, CheckCircle2, Cpu, FileCheck2, LineChart, Network, FileText } from 'lucide-react';
+import { CheckCircle2, Cpu, FileCheck2, LineChart, Network, FileText } from 'lucide-react';
 import FileUploader from '../upload/FileUploader';
 import ValidationReport from '../upload/ValidationReport';
 import { runAnalysis } from '../../api/analysis';
@@ -34,10 +34,6 @@ export default function HomePage() {
   return (
     <div className={styles.page}>
       <div className={styles.hero}>
-        <div className={styles.heroTag}>
-          <Sparkles size={14} />
-          <span>Next-Generation Analytical Intelligence</span>
-        </div>
         <h1 className={styles.heroTitle}>
           Chromatography Analytics & Automated PDF Reporting
         </h1>
