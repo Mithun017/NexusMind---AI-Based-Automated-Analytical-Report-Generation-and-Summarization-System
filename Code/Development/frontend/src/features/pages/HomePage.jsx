@@ -23,6 +23,9 @@ import {
   Check,
   AlertCircle,
   X,
+  Radio,
+  Disc,
+  Waves,
   Table as TableIcon
 } from 'lucide-react';
 import { uploadFile } from '../../api/upload';
@@ -33,17 +36,17 @@ const PRESETS = [
   {
     name: 'USP Standard QC',
     desc: 'Nominal purity (99.4%) with standard retention and baseline USP resolution',
-    params: { volume: 20, flow: 1.0, temp: 35, impurity: 2, noise: 0.003 },
+    params: { volume: 20, flow: 1.0, temp: 35, impurity: 2, noise: 0.003, pressure: 135, wavelength: 254 },
   },
   {
     name: 'Degradation Study',
     desc: 'Elevated impurity spike (14%) with peak tailing drift',
-    params: { volume: 45, flow: 0.8, temp: 45, impurity: 14, noise: 0.015 },
+    params: { volume: 45, flow: 0.8, temp: 45, impurity: 14, noise: 0.015, pressure: 220, wavelength: 280 },
   },
   {
     name: 'Fast Screening',
     desc: 'High flow rate (1.8 mL/min) with narrow peak separation',
-    params: { volume: 15, flow: 1.8, temp: 50, impurity: 4, noise: 0.005 },
+    params: { volume: 15, flow: 1.8, temp: 50, impurity: 4, noise: 0.005, pressure: 310, wavelength: 230 },
   },
 ];
 
@@ -69,12 +72,14 @@ export default function HomePage() {
   const [rawRows, setRawRows] = useState([]);
   const [dragActive, setDragActive] = useState(false);
 
-  // Volume Bar Parameters (Image 2 Aesthetic - Compact Sizing)
-  const [injVolume, setInjVolume] = useState(25);        // 5 to 100 uL
-  const [flowRate, setFlowRate] = useState(1.0);         // 0.4 to 2.5 mL/min
-  const [columnTemp, setColumnTemp] = useState(40);      // 20 to 65 °C
-  const [impurityRatio, setImpurityRatio] = useState(6); // 0 to 20 %
-  const [noiseLevel, setNoiseLevel] = useState(0.005);   // 0.001 to 0.040 mAU
+  // Volume Bar Parameters (Image 2 Aesthetic - 7 Distinct Parameters)
+  const [injVolume, setInjVolume] = useState(25);          // 5 to 100 uL
+  const [flowRate, setFlowRate] = useState(1.0);           // 0.4 to 2.5 mL/min
+  const [columnTemp, setColumnTemp] = useState(40);        // 20 to 65 °C
+  const [impurityRatio, setImpurityRatio] = useState(6);   // 0 to 20 %
+  const [noiseLevel, setNoiseLevel] = useState(0.005);     // 0.001 to 0.040 mAU
+  const [columnPressure, setColumnPressure] = useState(145); // 50 to 400 bar
+  const [wavelength, setWavelength] = useState(254);       // 200 to 400 nm
 
   const handleApplyPreset = (preset) => {
     setInjVolume(preset.params.volume);
@@ -82,6 +87,8 @@ export default function HomePage() {
     setColumnTemp(preset.params.temp);
     setImpurityRatio(preset.params.impurity);
     setNoiseLevel(preset.params.noise);
+    if (preset.params.pressure) setColumnPressure(preset.params.pressure);
+    if (preset.params.wavelength) setWavelength(preset.params.wavelength);
   };
 
   const handleResetSliders = () => {
@@ -90,6 +97,8 @@ export default function HomePage() {
     setColumnTemp(40);
     setImpurityRatio(6);
     setNoiseLevel(0.005);
+    setColumnPressure(145);
+    setWavelength(254);
   };
 
   // Parse CSV file content for real-time in-card preview and parameter binding
@@ -304,7 +313,7 @@ export default function HomePage() {
 
       {/* Main Single Page Unified Grid */}
       <div className={styles.unifiedGrid}>
-        {/* Left Column: Parameter Faders Simulator */}
+        {/* Left Column: Parameter Faders Simulator (7 Faders) */}
         <div className={styles.simulatorCard}>
           <div className={styles.cardHeader}>
             <div className={styles.cardTitleGroup}>
@@ -334,7 +343,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Compact Tactile Volume Bars (Image 2 Aesthetic) */}
+          {/* Compact Tactile Volume Bars (Image 2 Aesthetic - 7 Parameters) */}
           <div className={styles.volumeBarsContainer}>
             {/* 1: Injection Volume */}
             <div className={styles.volumeRow}>
@@ -473,6 +482,60 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
+
+            {/* 6: Column Backpressure (NEW) */}
+            <div className={styles.volumeRow}>
+              <div className={styles.volumeLabelBox}>
+                <Disc size={14} className={styles.paramIcon} />
+                <span className={styles.paramName}>Column Pressure (&Delta;P)</span>
+                <span className={styles.paramValueDisplay}>{columnPressure} bar</span>
+              </div>
+              <div className={styles.volumeTrackWrapper}>
+                <div className={styles.recessedTrack}>
+                  <div
+                    className={styles.activeFill}
+                    style={{ width: `${((columnPressure - 50) / 350) * 100}%` }}
+                  />
+                  <input
+                    type="range"
+                    min="50"
+                    max="400"
+                    step="5"
+                    value={columnPressure}
+                    onChange={(e) => setColumnPressure(parseInt(e.target.value))}
+                    className={styles.tactileInput}
+                    disabled={processing}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 7: Detector Wavelength (NEW) */}
+            <div className={styles.volumeRow}>
+              <div className={styles.volumeLabelBox}>
+                <Radio size={14} className={styles.paramIcon} />
+                <span className={styles.paramName}>Detector Wavelength (&lambda;)</span>
+                <span className={styles.paramValueDisplay}>{wavelength} nm</span>
+              </div>
+              <div className={styles.volumeTrackWrapper}>
+                <div className={styles.recessedTrack}>
+                  <div
+                    className={styles.activeFill}
+                    style={{ width: `${((wavelength - 200) / 200) * 100}%` }}
+                  />
+                  <input
+                    type="range"
+                    min="200"
+                    max="400"
+                    step="2"
+                    value={wavelength}
+                    onChange={(e) => setWavelength(parseInt(e.target.value))}
+                    className={styles.tactileInput}
+                    disabled={processing}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -591,14 +654,14 @@ export default function HomePage() {
             <>
               <FileSpreadsheet size={15} className={styles.goldIcon} />
               <span>
-                Ingesting: <strong>{selectedFile.name}</strong> + Modulating with <strong>{injVolume}&mu;L, {flowRate.toFixed(2)}mL/min, {columnTemp}&deg;C</strong>
+                Ingesting: <strong>{selectedFile.name}</strong> + Modulating with <strong>{injVolume}&mu;L, {flowRate.toFixed(2)}mL/min, {columnTemp}&deg;C, {columnPressure} bar, {wavelength} nm</strong>
               </span>
             </>
           ) : (
             <>
               <Sliders size={15} className={styles.goldIcon} />
               <span>
-                Synthetic Run: <strong>{injVolume}&mu;L, {flowRate.toFixed(2)}mL/min, {columnTemp}&deg;C, {impurityRatio}% Impurity</strong>
+                Synthetic Run: <strong>{injVolume}&mu;L, {flowRate.toFixed(2)}mL/min, {columnTemp}&deg;C, {columnPressure} bar, {wavelength} nm</strong>
               </span>
             </>
           )}
