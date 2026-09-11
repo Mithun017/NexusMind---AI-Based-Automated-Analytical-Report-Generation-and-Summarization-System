@@ -16,44 +16,122 @@
   display: flex;
   align-items: center;
   gap: var(--space-md);
+  min-width: 0;
 }
 
 .menuBtn {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px; /* 44px touch target */
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-md);
   color: var(--color-text);
   background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .menuBtn:hover {
   background: var(--color-surface-hover);
 }
 
+.breadcrumbWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sectionName {
+  font-size: 0.8rem;
+  color: var(--color-subtle);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.slash {
+  font-size: 0.8rem;
+  color: var(--color-border);
+}
+
 .pageTitle {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
 }
 
 .rightSection {
   display: flex;
   align-items: center;
   gap: var(--space-md);
+  flex-shrink: 0;
+}
+
+.quickLinks {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.quickBtnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  background: var(--color-accent);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.quickBtnPrimary:hover {
+  background: var(--color-accent-hover);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+}
+
+.quickBtnIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  color: var(--color-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.quickBtnIcon:hover {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}
+
+.healthGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
 }
 
 .healthBadge {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  padding: var(--space-xs) var(--space-sm);
+  padding: 4px 8px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--color-muted);
 }
 
@@ -78,5 +156,11 @@
   }
   .navbar {
     padding: 0 var(--space-md);
+  }
+  .sectionName, .slash {
+    display: none;
+  }
+  .healthGroup {
+    display: none;
   }
 }

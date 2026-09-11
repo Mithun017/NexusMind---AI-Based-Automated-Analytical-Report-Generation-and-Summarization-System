@@ -1,8 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Loader2, Calendar, FileText, Activity } from 'lucide-react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import {
+  Loader2,
+  Calendar,
+  FileText,
+  Activity,
+  Share2,
+  AlertTriangle,
+  UploadCloud,
+  ChevronDown
+} from 'lucide-react';
 import { getAnalysis } from '../../api/analysis';
 import { getGraphData } from '../../api/graph';
+import { getHistory } from '../../api/history';
 import KPICards from '../dashboard/KPICards';
 import Chromatogram from '../dashboard/Chromatogram';
 import PeakTable from '../dashboard/PeakTable';
@@ -13,36 +23,64 @@ import ReportActions from '../report/ReportActions';
 import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
-  const { analysisId } = useParams();
+  const { analysisId: paramAnalysisId } = useParams();
+  const navigate = useNavigate();
+
+  const [activeAnalysisId, setActiveAnalysisId] = useState(paramAnalysisId || null);
+  const [historyList, setHistoryList] = useState([]);
   const [analysis, setAnalysis] = useState(null);
   const [graphData, setGraphData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchFullAnalysis = async () => {
-    try {
-      setLoading(true);
-      const data = await getAnalysis(analysisId);
-      setAnalysis(data);
-
-      try {
-        const gData = await getGraphData(analysisId);
-        setGraphData(gData);
-      } catch (gErr) {
-        console.warn('Graph data fetch skipped or unavailable:', gErr);
-      }
-    } catch (err) {
-      setError(err.message || 'Failed to load analysis details.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Load available history runs for quick switcher
   useEffect(() => {
-    if (analysisId) {
-      fetchFullAnalysis();
-    }
-  }, [analysisId]);
+    const fetchRuns = async () => {
+      try {
+        const res = await getHistory(1, 20);
+        if (res.items && res.items.length > 0) {
+          setHistoryList(res.items);
+          if (!paramAnalysisId) {
+            setActiveAnalysisId(res.items[0]._id);
+            navigate(`/dashboard/${res.items[0]._id}`, { replace: true });
+          }
+        } else if (!paramAnalysisId) {
+          setLoading(false);
+        }
+      } catch (err) {
+        console.warn('Could not fetch history runs for dashboard selector:', err);
+      }
+    };
+    fetchRuns();
+  }, [paramAnalysisId]);
+
+  // When active ID changes, fetch details
+  useEffect(() => {
+    if (!paramAnalysisId && !activeAnalysisId) return;
+    const targetId = paramAnalysisId || activeAnalysisId;
+
+    const fetchFullAnalysis = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getAnalysis(targetId);
+        setAnalysis(data);
+
+        try {
+          const gData = await getGraphData(targetId);
+          setGraphData(gData);
+        } catch (gErr) {
+          console.warn('Graph data fetch skipped or unavailable:', gErr);
+        }
+      } catch (err) {
+        setError(err.message || 'Failed to load analysis details.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFullAnalysis();
+  }, [paramAnalysisId, activeAnalysisId]);
 
   const handleSummaryGenerated = (summaryRes) => {
     setAnalysis((prev) => ({
@@ -50,6 +88,11 @@ export default function DashboardPage() {
       ai_interpretation: summaryRes.interpretation,
       ai_summary: summaryRes.summary,
     }));
+  };
+
+  const handleSwitchAnalysis = (id) => {
+    setActiveAnalysisId(id);
+    navigate(`/dashboard/${id}`);
   };
 
   if (loading) {
@@ -61,20 +104,57 @@ export default function DashboardPage() {
     );
   }
 
-  if (error || !analysis) {
+  if (!paramAnalysisId && (!historyList || historyList.length === 0)) {
     return (
-      <div className={styles.loadingWrapper}>
-        <div style={{ color: '#ef4444' }}>{error || 'Analysis record not found.'}</div>
+      <div className={styles.emptyStateContainer}>
+        <div className={styles.emptyCard}>
+          <UploadCloud size={48} className={styles.emptyIcon} />
+          <h2>No Analytical Runs Yet</h2>
+          <p>
+            Upload your chromatographic raw dataset (CSV, XLSX, JSON) in the Studio to execute the 7-step deterministic and ML pipeline.
+          </p>
+          <Link to="/" className={styles.ctaBtn}>
+            Launch New Analysis Studio
+          </Link>
+        </div>
       </div>
     );
   }
 
+  if (error || !analysis) {
+    return (
+      <div className={styles.loadingWrapper}>
+        <div style={{ color: '#ef4444' }}>{error || 'Analysis record not found.'}</div>
+        <Link to="/" style={{ color: '#38bdf8', marginTop: '12px' }}>
+          Back to New Analysis Studio
+        </Link>
+      </div>
+    );
+  }
+
+  const currentId = paramAnalysisId || activeAnalysisId;
+
   return (
     <div className={styles.page}>
-      {/* 1. Header Metadata */}
+      {/* 1. Header Metadata & Quick Navigation Bar */}
       <div className={styles.metaHeader}>
         <div className={styles.metaLeft}>
-          <div className={styles.sampleTitle}>{analysis.sample_id || 'Sample'}</div>
+          <div className={styles.titleSelectRow}>
+            <div className={styles.sampleTitle}>{analysis.sample_id || 'Sample Analysis'}</div>
+            {historyList.length > 1 && (
+              <select
+                value={currentId}
+                onChange={(e) => handleSwitchAnalysis(e.target.value)}
+                className={styles.runDropdown}
+              >
+                {historyList.map((h) => (
+                  <option key={h._id} value={h._id}>
+                    {h.sample_id || h._id.slice(0, 8)} ({new Date(h.created_at).toLocaleDateString()})
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
           <div className={styles.metaTags}>
             <span className={styles.tag}>
               Type: {analysis.kpis?.analysis_type || 'HPLC-UV/Vis'}
@@ -82,11 +162,29 @@ export default function DashboardPage() {
             <span className={styles.tag}>Status: {analysis.status}</span>
           </div>
         </div>
-        <div className={styles.metaTags}>
-          <Calendar size={14} />
-          <span>
-            {new Date(analysis.created_at).toLocaleString()}
-          </span>
+
+        <div className={styles.metaRight}>
+          <div className={styles.quickNavTools}>
+            <Link
+              to={`/graph/${currentId}`}
+              className={styles.deepDiveLink}
+              title="Open Knowledge Graph Explorer"
+            >
+              <Share2 size={14} /> Full Graph
+            </Link>
+            <Link
+              to={`/diagnostics/${currentId}`}
+              className={styles.deepDiveLink}
+              title="Open ML Isolation Forest Diagnostics"
+            >
+              <AlertTriangle size={14} /> Diagnostics
+            </Link>
+          </div>
+
+          <div className={styles.dateBadge}>
+            <Calendar size={14} />
+            <span>{new Date(analysis.created_at).toLocaleString()}</span>
+          </div>
         </div>
       </div>
 
@@ -113,14 +211,14 @@ export default function DashboardPage() {
 
       {/* 7. AI Analytical Reasoning & Summary Panel */}
       <AISummaryPanel
-        analysisId={analysisId}
+        analysisId={currentId}
         aiSummary={analysis.ai_summary}
         aiInterpretation={analysis.ai_interpretation}
         onSummaryGenerated={handleSummaryGenerated}
       />
 
       {/* 8. Report Generation & Export Actions */}
-      <ReportActions analysisId={analysisId} />
+      <ReportActions analysisId={currentId} />
     </div>
   );
 }

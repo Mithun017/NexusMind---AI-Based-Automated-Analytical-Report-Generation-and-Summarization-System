@@ -1,48 +1,117 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
-  animation: fadeIn var(--transition-fast);
+  gap: var(--space-xl);
+  padding-bottom: var(--space-2xl);
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .metaHeader {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-md) var(--space-lg);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-lg);
+  box-shadow: var(--shadow-sm);
   flex-wrap: wrap;
   gap: var(--space-md);
 }
 
 .metaLeft {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.titleSelectRow {
+  display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .sampleTitle {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.runDropdown {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-accent-2);
+  padding: 4px 10px;
+  font-size: 0.82rem;
   font-family: var(--font-mono);
+  outline: none;
+}
+
+.runDropdown option {
+  background: #0f172a;
+  color: #fff;
 }
 
 .metaTags {
   display: flex;
+  align-items: center;
   gap: var(--space-sm);
-  font-size: 0.8rem;
-  color: var(--color-muted);
 }
 
 .tag {
-  background: var(--color-surface);
-  padding: 3px 8px;
+  font-size: 0.75rem;
+  padding: 2px 8px;
   border-radius: var(--radius-sm);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
+  color: var(--color-muted);
+}
+
+.metaRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.quickNavTools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deepDiveLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.deepDiveLink:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-accent-2);
+  border-color: rgba(6, 182, 212, 0.4);
+}
+
+.dateBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--color-subtle);
 }
 
 .loadingWrapper {
@@ -50,7 +119,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
+  min-height: 400px;
   gap: var(--space-md);
   color: var(--color-muted);
 }
@@ -58,4 +127,69 @@
 .spinner {
   animation: spin 1s linear infinite;
   color: var(--color-accent);
+}
+
+.emptyStateContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  padding: var(--space-xl);
+}
+
+.emptyCard {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  text-align: center;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.emptyIcon {
+  color: var(--color-accent);
+}
+
+.emptyCard h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text);
+}
+
+.emptyCard p {
+  font-size: 0.88rem;
+  color: var(--color-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ctaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-accent);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  margin-top: var(--space-sm);
+}
+
+.ctaBtn:hover {
+  background: var(--color-accent-hover);
+  box-shadow: var(--shadow-glow);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
