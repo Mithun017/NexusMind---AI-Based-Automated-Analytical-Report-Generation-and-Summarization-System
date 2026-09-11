@@ -12,7 +12,13 @@ class GroqProvider(LLMProvider):
     def __init__(self, settings: Settings = None):
         self.settings = settings or get_settings()
         self.api_key = self.settings.groq_api_key
-        self.model = self.settings.groq_model
+        
+        # Build models_to_try dynamically from environment configuration
+        configured_models = list(self.settings.groq_models_list)
+        if self.settings.groq_model and self.settings.groq_model not in configured_models:
+            configured_models.insert(0, self.settings.groq_model)
+        self.models_to_try = configured_models
+
         if self.api_key:
             self.client = AsyncGroq(api_key=self.api_key)
         else:
@@ -22,29 +28,34 @@ class GroqProvider(LLMProvider):
         if not self.client or not self.api_key:
             raise LLMProviderError("Groq API key is not configured.")
 
-        try:
-            resp = await self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_message},
-                ],
-                temperature=0.2,
-            )
-            return resp.choices[0].message.content
-        except (RateLimitError, APIStatusError, APITimeoutError) as e:
-            logger.warning(f"Groq API error: {e}")
-            raise LLMProviderError(f"Groq provider error: {str(e)}") from e
-        except Exception as e:
-            logger.error(f"Unexpected Groq error: {e}")
-            raise LLMProviderError(f"Groq provider unexpected error: {str(e)}") from e
+        last_error = None
+        for model_name in self.models_to_try:
+            try:
+                logger.info(f"Attempting Groq completion with model: {model_name}")
+                resp = await self.client.chat.completions.create(
+                    model=model_name,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_message},
+                    ],
+                    temperature=0.2,
+                )
+                if resp.choices and resp.choices[0].message and resp.choices[0].message.content:
+                    content = resp.choices[0].message.content
+                    logger.info(f"Groq completion succeeded using model '{model_name}'")
+                    return content
+            except (RateLimitError, APIStatusError, APITimeoutError, Exception) as e:
+                logger.warning(f"Groq model '{model_name}' failed: {e}. Trying fallback model...")
+                last_error = e
+
+        raise LLMProviderError(f"All configured Groq models failed ({self.models_to_try}). Last error: {str(last_error)}")
 
     async def list_models(self) -> List[str]:
         if not self.client or not self.api_key:
-            return []
+            return self.models_to_try
         try:
             resp = await self.client.models.list()
             return [m.id for m in resp.data]
         except Exception as e:
             logger.warning(f"Failed to fetch Groq models list: {e}")
-            return []
+            return self.models_to_try

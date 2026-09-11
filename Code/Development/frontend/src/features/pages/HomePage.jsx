@@ -21,7 +21,9 @@ import {
   ArrowRight,
   FileSpreadsheet,
   Check,
-  AlertCircle
+  AlertCircle,
+  X,
+  Table as TableIcon
 } from 'lucide-react';
 import { uploadFile } from '../../api/upload';
 import { runAnalysis } from '../../api/analysis';
@@ -63,6 +65,7 @@ export default function HomePage() {
 
   // Manual File Upload State
   const [selectedFile, setSelectedFile] = useState(null);
+  const [previewData, setPreviewData] = useState(null);
   const [dragActive, setDragActive] = useState(false);
 
   // Volume Bar Parameters (Image 2 Aesthetic - Compact Sizing)
@@ -86,6 +89,32 @@ export default function HomePage() {
     setColumnTemp(40);
     setImpurityRatio(6);
     setNoiseLevel(0.005);
+  };
+
+  // Parse CSV file content for real-time in-card preview
+  const parseFilePreview = (file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target.result;
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length > 0) {
+          const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+          const rows = lines.slice(1, 8).map(line => {
+            return line.split(',').map(cell => cell.trim().replace(/^"|"$/g, ''));
+          });
+          setPreviewData({
+            headers,
+            rows,
+            totalRows: lines.length - 1
+          });
+        }
+      } catch (err) {
+        console.warn('Failed to parse preview:', err);
+      }
+    };
+    reader.readAsText(file);
   };
 
   // Animate pipeline execution across 6 steps with glowing state transitions
@@ -137,37 +166,27 @@ export default function HomePage() {
     setProcessing(true);
     setErrorMessage('');
     try {
-      // Synthesize realistic HPLC time series
-      const samplingRate = 20;
-      const totalTime = 12 / flowRate;
-      const numPoints = Math.floor(totalTime * samplingRate);
+      // Synthesize realistic HPLC analytical dataset matching canonical backend schema
+      let csvContent = 'Sample ID,Retention Time,Peak Area,Peak Height,Intensity,Concentration,Compound Name,Analysis Type\n';
       
-      let csvContent = 'Retention_Time_min,Absorbance_mAU\n';
-      
-      const peaks = [
-        { tr: 2.1 / flowRate, height: 45 * (injVolume / 25), width: 0.18 * (40 / columnTemp) },
-        { tr: 4.85 / flowRate, height: 320 * (injVolume / 25), width: 0.22 * (40 / columnTemp) },
-        { tr: 6.9 / flowRate, height: (impurityRatio * 18) * (injVolume / 25), width: 0.26 * (40 / columnTemp) },
-        { tr: 8.4 / flowRate, height: 22 * (injVolume / 25), width: 0.24 * (40 / columnTemp) },
+      const compounds = [
+        { name: 'Uracil (Void Marker)', tr: 1.25 / flowRate, area: 12450 * (injVolume / 25), height: 3200 * (injVolume / 25), conc: 0.0125 },
+        { name: 'Acetaminophen', tr: 2.80 / flowRate, area: 45800 * (injVolume / 25), height: 8900 * (injVolume / 25), conc: 0.0458 },
+        { name: 'Caffeine (Main Peak)', tr: 4.15 / flowRate, area: 89200 * (injVolume / 25), height: 14500 * (injVolume / 25), conc: 0.0892 },
+        { name: 'Aspirin', tr: 5.60 / flowRate, area: 23100 * (injVolume / 25), height: 5100 * (injVolume / 25), conc: 0.0231 },
+        { name: 'Related Degradant / Impurity', tr: 7.20 / flowRate, area: (impurityRatio * 5500 + 500) * (injVolume / 25), height: (impurityRatio * 900 + 100) * (injVolume / 25), conc: (impurityRatio * 0.005 + 0.001) },
+        { name: 'Phenacetin', tr: 8.95 / flowRate, area: 31200 * (injVolume / 25), height: 6400 * (injVolume / 25), conc: 0.0312 },
+        { name: 'Salicylic Acid', tr: 10.40 / flowRate, area: 15600 * (injVolume / 25), height: 3800 * (injVolume / 25), conc: 0.0156 },
+        { name: 'Chlorpheniramine', tr: 12.10 / flowRate, area: 54200 * (injVolume / 25), height: 9800 * (injVolume / 25), conc: 0.0542 }
       ];
 
-      for (let i = 0; i <= numPoints; i++) {
-        const t = (i / samplingRate);
-        let signal = 0;
-        
-        peaks.forEach(p => {
-          const exponent = -Math.pow(t - p.tr, 2) / (2 * Math.pow(p.width, 2));
-          signal += p.height * Math.exp(exponent);
-        });
+      compounds.forEach((comp) => {
+        const noise = (Math.random() - 0.5) * noiseLevel * 1000;
+        const finalIntensity = Math.max(10, comp.height + noise);
+        csvContent += `SMP-001,${comp.tr.toFixed(2)},${comp.area.toFixed(1)},${comp.height.toFixed(1)},${finalIntensity.toFixed(1)},${comp.conc.toFixed(4)},${comp.name},HPLC-UV/Vis\n`;
+      });
 
-        const randomNoise = (Math.random() - 0.5) * noiseLevel * 200;
-        const baselineDrift = 0.05 * t;
-        const finalSignal = Math.max(0, signal + baselineDrift + randomNoise);
-
-        csvContent += `${t.toFixed(4)},${finalSignal.toFixed(4)}\n`;
-      }
-
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const timestamp = Date.now();
       const filename = `Simulated_Run_Vol${injVolume}uL_Flow${flowRate.toFixed(1)}_${timestamp}.csv`;
       const blob = new Blob([csvContent], { type: 'text/csv' });
       const file = new File([blob], filename, { type: 'text/csv' });
@@ -201,6 +220,7 @@ export default function HomePage() {
       const name = file.name.toLowerCase();
       if (name.endsWith('.csv') || name.endsWith('.xlsx')) {
         setSelectedFile(file);
+        parseFilePreview(file);
       } else {
         setErrorMessage('Unsupported format. Please select a .csv or .xlsx dataset.');
       }
@@ -211,7 +231,13 @@ export default function HomePage() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedFile(file);
+      parseFilePreview(file);
     }
+  };
+
+  const handleClearFile = () => {
+    setSelectedFile(null);
+    setPreviewData(null);
   };
 
   const handleRunManualUpload = async () => {
@@ -225,6 +251,15 @@ export default function HomePage() {
       setErrorMessage(err.message || 'File ingestion failed.');
       setProcessing(false);
       setCurrentStep(0);
+    }
+  };
+
+  // Unified Single Master Action
+  const handleExecuteMaster = () => {
+    if (selectedFile) {
+      handleRunManualUpload();
+    } else {
+      handleRunSimulator();
     }
   };
 
@@ -411,39 +446,30 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-
-          {/* Simulator Actions */}
-          <div className={styles.simActionsRow}>
-            <button
-              onClick={handleResetSliders}
-              className={styles.resetBtn}
-              type="button"
-              disabled={processing}
-            >
-              <RotateCcw size={13} /> Reset
-            </button>
-            <button
-              onClick={handleRunSimulator}
-              disabled={processing}
-              className={styles.runSimBtn}
-              type="button"
-            >
-              <Play size={15} />
-              <span>Simulate & Execute Run</span>
-            </button>
-          </div>
         </div>
 
-        {/* Right Column: Ingest File Dropzone */}
+        {/* Right Column: Ingest File Dropzone / Interactive Data Preview */}
         <div className={styles.uploadCard}>
           <div className={styles.cardHeader}>
             <div className={styles.cardTitleGroup}>
               <UploadCloud size={18} className={styles.goldIcon} />
               <div>
                 <h2 className={styles.cardTitle}>Manual File Ingestion</h2>
-                <span className={styles.cardSubtitle}>Raw instrument exports (.csv / .xlsx)</span>
+                <span className={styles.cardSubtitle}>
+                  {selectedFile ? 'Parsed Dataset Preview & Ingestion' : 'Raw instrument exports (.csv / .xlsx)'}
+                </span>
               </div>
             </div>
+            {selectedFile && (
+              <button
+                onClick={handleClearFile}
+                className={styles.iconCloseBtn}
+                title="Remove and select different file"
+                type="button"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
 
           {!selectedFile ? (
@@ -474,31 +500,48 @@ export default function HomePage() {
             </div>
           ) : (
             <div className={styles.selectedFileContainer}>
+              {/* File Info Bar */}
               <div className={styles.selectedFileInfo}>
-                <FileSpreadsheet size={24} className={styles.goldIcon} />
+                <div className={styles.fileIconBadge}>
+                  <FileSpreadsheet size={16} />
+                </div>
                 <div className={styles.fileDetails}>
                   <span className={styles.fileName}>{selectedFile.name}</span>
                   <span className={styles.fileSize}>
-                    {(selectedFile.size / 1024).toFixed(1)} KB &bull; Ready for pipeline
+                    {(selectedFile.size / 1024).toFixed(1)} KB &bull; {previewData?.totalRows || 'Canonical'} rows detected
                   </span>
                 </div>
               </div>
-              <div className={styles.fileActions}>
-                <button
-                  onClick={() => setSelectedFile(null)}
-                  className={styles.removeFileBtn}
-                  disabled={processing}
-                >
-                  Change File
-                </button>
-                <button
-                  onClick={handleRunManualUpload}
-                  disabled={processing}
-                  className={styles.runUploadBtn}
-                >
-                  <ArrowRight size={15} />
-                  <span>Analyze Dataset</span>
-                </button>
+
+              {/* Live Interactive Data Table Preview */}
+              <div className={styles.previewTableWrapper}>
+                {previewData && previewData.headers.length > 0 ? (
+                  <div className={styles.tableScroll}>
+                    <table className={styles.previewTable}>
+                      <thead>
+                        <tr>
+                          {previewData.headers.map((h, i) => (
+                            <th key={i}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {previewData.rows.map((row, rIdx) => (
+                          <tr key={rIdx}>
+                            {row.map((cell, cIdx) => (
+                              <td key={cIdx}>{cell}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className={styles.tablePlaceholder}>
+                    <TableIcon size={20} className={styles.goldIcon} />
+                    <span>Dataset structured & formatted for validation</span>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -513,7 +556,57 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Glowing 6-Step Analytical Pipeline Progress Stepper (Image 3 Area) */}
+      {/* Unified Single Action Master Execution Bar (Combined Execute Button) */}
+      <div className={styles.masterActionBar}>
+        <div className={styles.modeSummaryBadge}>
+          {selectedFile ? (
+            <>
+              <FileSpreadsheet size={15} className={styles.goldIcon} />
+              <span>Target: Ingesting Uploaded File &bull; <strong>{selectedFile.name}</strong></span>
+            </>
+          ) : (
+            <>
+              <Sliders size={15} className={styles.goldIcon} />
+              <span>Target: Synthetic Run &bull; <strong>{injVolume}&mu;L, {flowRate.toFixed(2)}mL/min, {columnTemp}&deg;C</strong></span>
+            </>
+          )}
+        </div>
+
+        <div className={styles.masterBtnGroup}>
+          {!selectedFile && (
+            <button
+              onClick={handleResetSliders}
+              className={styles.resetBtn}
+              type="button"
+              disabled={processing}
+              title="Reset parameters to standard QC defaults"
+            >
+              <RotateCcw size={13} /> Reset Parameters
+            </button>
+          )}
+
+          <button
+            onClick={handleExecuteMaster}
+            disabled={processing}
+            className={styles.masterExecBtn}
+            type="button"
+          >
+            {processing ? (
+              <>
+                <Activity size={16} className={styles.spin} />
+                <span>Executing Pipeline Engine...</span>
+              </>
+            ) : (
+              <>
+                <Play size={16} />
+                <span>{selectedFile ? 'Analyze Ingested Dataset' : 'Simulate & Execute Analytical Run'}</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Pulled-Down 6-Step Analytical Pipeline Stepper (Docked at Bottom) */}
       <div className={styles.pipelineCard}>
         <div className={styles.pipelineHeader}>
           <div className={styles.pipelineStatusBadge}>
