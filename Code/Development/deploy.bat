@@ -11,6 +11,26 @@ echo.
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":8000" ^| findstr "LISTENING"') do taskkill /f /pid %%a >nul 2>&1
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":5173" ^| findstr "LISTENING"') do taskkill /f /pid %%a >nul 2>&1
 
+:: Check & Install backend requirements if needed
+python -c "import motor, beanie, neo4j, fastapi" >nul 2>&1
+if %errorlevel% neq 0 (
+    if not exist "%~dp0backend\venv\Scripts\activate.bat" (
+        echo Setting up Python virtual environment (venv)...
+        python -m venv "%~dp0backend\venv"
+    )
+    echo Installing backend dependencies...
+    call "%~dp0backend\venv\Scripts\activate.bat"
+    pip install -r "%~dp0backend\requirements.txt"
+)
+
+:: Check & Install frontend dependencies if needed
+if not exist "%~dp0frontend\node_modules\" (
+    echo Installing frontend node packages...
+    cd /d "%~dp0frontend"
+    call npm install
+    cd /d "%~dp0"
+)
+
 echo  [1] Host on Local WiFi Network (IP Shareable)
 echo  [2] Public HTTPS URL via Cloudflare Tunnel (cloudflared)
 echo  [3] Production Build and Preview Mode (Local Production Server)
