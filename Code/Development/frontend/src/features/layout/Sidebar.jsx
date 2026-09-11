@@ -45,14 +45,11 @@ export default function Sidebar({ isOpen, onClose }) {
     <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
       <div className={styles.brand}>
         <div className={styles.logoIcon}>
-          <Layers size={22} />
+          <img src="/logo.svg" alt="NexusMind Logo" width="36" height="36" />
         </div>
         <div className={styles.brandText}>
-          <div className={styles.brandTitleRow}>
-            <span className={styles.brandTitle}>NexusMind</span>
-            <span className={styles.proPill}>PRO</span>
-          </div>
-          <span className={styles.brandSubtitle}>Analytical Intelligence</span>
+          <span className={styles.brandTitle}>NexusMind</span>
+          <span className={styles.brandSubtitle}>ANALYTICAL INTELLIGENCE</span>
         </div>
       </div>
 
