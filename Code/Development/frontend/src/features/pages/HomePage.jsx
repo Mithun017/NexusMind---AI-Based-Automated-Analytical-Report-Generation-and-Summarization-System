@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, Cpu, FileCheck2, LineChart, Network, FileText } from 'lucide-react';
+import { Sparkles, CheckCircle2, Cpu, FileCheck2, LineChart, Network, FileText } from 'lucide-react';
 import FileUploader from '../upload/FileUploader';
 import ValidationReport from '../upload/ValidationReport';
 import { runAnalysis } from '../../api/analysis';
