@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Zap,
@@ -63,17 +63,18 @@ export default function HomePage() {
   const [statusMessage, setStatusMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Manual File Upload State
+  // Manual File Upload & Raw Ingestion State
   const [selectedFile, setSelectedFile] = useState(null);
-  const [previewData, setPreviewData] = useState(null);
+  const [rawHeaders, setRawHeaders] = useState([]);
+  const [rawRows, setRawRows] = useState([]);
   const [dragActive, setDragActive] = useState(false);
 
   // Volume Bar Parameters (Image 2 Aesthetic - Compact Sizing)
-  const [injVolume, setInjVolume] = useState(25);      // 5 to 100 uL
-  const [flowRate, setFlowRate] = useState(1.0);       // 0.4 to 2.5 mL/min
-  const [columnTemp, setColumnTemp] = useState(40);    // 20 to 65 °C
+  const [injVolume, setInjVolume] = useState(25);        // 5 to 100 uL
+  const [flowRate, setFlowRate] = useState(1.0);         // 0.4 to 2.5 mL/min
+  const [columnTemp, setColumnTemp] = useState(40);      // 20 to 65 °C
   const [impurityRatio, setImpurityRatio] = useState(6); // 0 to 20 %
-  const [noiseLevel, setNoiseLevel] = useState(0.005); // 0.001 to 0.040 mAU
+  const [noiseLevel, setNoiseLevel] = useState(0.005);   // 0.001 to 0.040 mAU
 
   const handleApplyPreset = (preset) => {
     setInjVolume(preset.params.volume);
@@ -91,7 +92,7 @@ export default function HomePage() {
     setNoiseLevel(0.005);
   };
 
-  // Parse CSV file content for real-time in-card preview
+  // Parse CSV file content for real-time in-card preview and parameter binding
   const parseFilePreview = (file) => {
     if (!file) return;
     const reader = new FileReader();
@@ -101,21 +102,56 @@ export default function HomePage() {
         const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
         if (lines.length > 0) {
           const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-          const rows = lines.slice(1, 8).map(line => {
+          const parsed = lines.slice(1).map(line => {
             return line.split(',').map(cell => cell.trim().replace(/^"|"$/g, ''));
           });
-          setPreviewData({
-            headers,
-            rows,
-            totalRows: lines.length - 1
-          });
+          setRawHeaders(headers);
+          setRawRows(parsed);
         }
       } catch (err) {
-        console.warn('Failed to parse preview:', err);
+        console.warn('Failed to parse file preview:', err);
       }
     };
     reader.readAsText(file);
   };
+
+  // Dynamically compute modulated preview rows based on current faders
+  const modulatedPreviewRows = useMemo(() => {
+    if (!rawRows || rawRows.length === 0) return [];
+    
+    const trIdx = rawHeaders.findIndex(h => h.toLowerCase().includes('retention'));
+    const areaIdx = rawHeaders.findIndex(h => h.toLowerCase().includes('area'));
+    const heightIdx = rawHeaders.findIndex(h => h.toLowerCase().includes('height'));
+    const intensityIdx = rawHeaders.findIndex(h => h.toLowerCase().includes('intensity'));
+    const concIdx = rawHeaders.findIndex(h => h.toLowerCase().includes('concentration'));
+    const compoundIdx = rawHeaders.findIndex(h => h.toLowerCase().includes('compound'));
+
+    return rawRows.map((row) => {
+      const newRow = [...row];
+      // Modulate retention time inversely with flow rate
+      if (trIdx !== -1 && !isNaN(parseFloat(row[trIdx]))) {
+        newRow[trIdx] = (parseFloat(row[trIdx]) / flowRate).toFixed(2);
+      }
+      // Scale peak area by injection volume
+      if (areaIdx !== -1 && !isNaN(parseFloat(row[areaIdx]))) {
+        newRow[areaIdx] = (parseFloat(row[areaIdx]) * (injVolume / 25)).toFixed(1);
+      }
+      // Scale peak height by injection volume
+      if (heightIdx !== -1 && !isNaN(parseFloat(row[heightIdx]))) {
+        newRow[heightIdx] = (parseFloat(row[heightIdx]) * (injVolume / 25)).toFixed(1);
+      }
+      // Modulate intensity with injection scale + detector noise
+      if (intensityIdx !== -1 && !isNaN(parseFloat(row[intensityIdx]))) {
+        const noise = (noiseLevel * 100);
+        newRow[intensityIdx] = Math.max(10, (parseFloat(row[intensityIdx]) * (injVolume / 25)) + noise).toFixed(1);
+      }
+      // Impurity modulation
+      if (concIdx !== -1 && compoundIdx !== -1 && row[compoundIdx] && row[compoundIdx].toLowerCase().includes('impurity')) {
+        newRow[concIdx] = (impurityRatio * 0.005 + 0.001).toFixed(4);
+      }
+      return newRow;
+    });
+  }, [rawRows, rawHeaders, flowRate, injVolume, noiseLevel, impurityRatio]);
 
   // Animate pipeline execution across 6 steps with glowing state transitions
   const executePipelineWithProgress = async (uploadRes) => {
@@ -161,49 +197,61 @@ export default function HomePage() {
     navigate(`/dashboard/${analysisRes.analysis_id}`);
   };
 
-  // 1. Synthetic Simulator Execution
-  const handleRunSimulator = async () => {
+  // Unified Joint Execution: Combines File Dataset + Physical Chromatographic Faders
+  const handleExecuteCombinedAnalysis = async () => {
     setProcessing(true);
     setErrorMessage('');
+
     try {
-      // Synthesize realistic HPLC analytical dataset matching canonical backend schema
-      let csvContent = 'Sample ID,Retention Time,Peak Area,Peak Height,Intensity,Concentration,Compound Name,Analysis Type\n';
-      
-      const compounds = [
-        { name: 'Uracil (Void Marker)', tr: 1.25 / flowRate, area: 12450 * (injVolume / 25), height: 3200 * (injVolume / 25), conc: 0.0125 },
-        { name: 'Acetaminophen', tr: 2.80 / flowRate, area: 45800 * (injVolume / 25), height: 8900 * (injVolume / 25), conc: 0.0458 },
-        { name: 'Caffeine (Main Peak)', tr: 4.15 / flowRate, area: 89200 * (injVolume / 25), height: 14500 * (injVolume / 25), conc: 0.0892 },
-        { name: 'Aspirin', tr: 5.60 / flowRate, area: 23100 * (injVolume / 25), height: 5100 * (injVolume / 25), conc: 0.0231 },
-        { name: 'Related Degradant / Impurity', tr: 7.20 / flowRate, area: (impurityRatio * 5500 + 500) * (injVolume / 25), height: (impurityRatio * 900 + 100) * (injVolume / 25), conc: (impurityRatio * 0.005 + 0.001) },
-        { name: 'Phenacetin', tr: 8.95 / flowRate, area: 31200 * (injVolume / 25), height: 6400 * (injVolume / 25), conc: 0.0312 },
-        { name: 'Salicylic Acid', tr: 10.40 / flowRate, area: 15600 * (injVolume / 25), height: 3800 * (injVolume / 25), conc: 0.0156 },
-        { name: 'Chlorpheniramine', tr: 12.10 / flowRate, area: 54200 * (injVolume / 25), height: 9800 * (injVolume / 25), conc: 0.0542 }
-      ];
-
-      compounds.forEach((comp) => {
-        const noise = (Math.random() - 0.5) * noiseLevel * 1000;
-        const finalIntensity = Math.max(10, comp.height + noise);
-        csvContent += `SMP-001,${comp.tr.toFixed(2)},${comp.area.toFixed(1)},${comp.height.toFixed(1)},${finalIntensity.toFixed(1)},${comp.conc.toFixed(4)},${comp.name},HPLC-UV/Vis\n`;
-      });
-
+      let csvContent = '';
       const timestamp = Date.now();
-      const filename = `Simulated_Run_Vol${injVolume}uL_Flow${flowRate.toFixed(1)}_${timestamp}.csv`;
+      let filename = '';
+
+      if (selectedFile && rawHeaders.length > 0 && modulatedPreviewRows.length > 0) {
+        // 1. Build CSV from uploaded dataset modulated by the live faders
+        csvContent = rawHeaders.join(',') + '\n';
+        modulatedPreviewRows.forEach(row => {
+          csvContent += row.join(',') + '\n';
+        });
+        filename = `Ingested_${selectedFile.name.replace(/\.[^/.]+$/, "")}_Vol${injVolume}uL_Flow${flowRate.toFixed(1)}_${timestamp}.csv`;
+      } else {
+        // 2. Synthesize complete standard analytical dataset from current faders
+        csvContent = 'Sample ID,Retention Time,Peak Area,Peak Height,Intensity,Concentration,Compound Name,Analysis Type\n';
+        const compounds = [
+          { name: 'Uracil (Void Marker)', tr: 1.25 / flowRate, area: 12450 * (injVolume / 25), height: 3200 * (injVolume / 25), conc: 0.0125 },
+          { name: 'Acetaminophen', tr: 2.80 / flowRate, area: 45800 * (injVolume / 25), height: 8900 * (injVolume / 25), conc: 0.0458 },
+          { name: 'Caffeine (Main Peak)', tr: 4.15 / flowRate, area: 89200 * (injVolume / 25), height: 14500 * (injVolume / 25), conc: 0.0892 },
+          { name: 'Aspirin', tr: 5.60 / flowRate, area: 23100 * (injVolume / 25), height: 5100 * (injVolume / 25), conc: 0.0231 },
+          { name: 'Related Degradant / Impurity', tr: 7.20 / flowRate, area: (impurityRatio * 5500 + 500) * (injVolume / 25), height: (impurityRatio * 900 + 100) * (injVolume / 25), conc: (impurityRatio * 0.005 + 0.001) },
+          { name: 'Phenacetin', tr: 8.95 / flowRate, area: 31200 * (injVolume / 25), height: 6400 * (injVolume / 25), conc: 0.0312 },
+          { name: 'Salicylic Acid', tr: 10.40 / flowRate, area: 15600 * (injVolume / 25), height: 3800 * (injVolume / 25), conc: 0.0156 },
+          { name: 'Chlorpheniramine', tr: 12.10 / flowRate, area: 54200 * (injVolume / 25), height: 9800 * (injVolume / 25), conc: 0.0542 }
+        ];
+
+        compounds.forEach((comp) => {
+          const noise = (Math.random() - 0.5) * noiseLevel * 1000;
+          const finalIntensity = Math.max(10, comp.height + noise);
+          csvContent += `SMP-001,${comp.tr.toFixed(2)},${comp.area.toFixed(1)},${comp.height.toFixed(1)},${finalIntensity.toFixed(1)},${comp.conc.toFixed(4)},${comp.name},HPLC-UV/Vis\n`;
+        });
+        filename = `Simulated_Run_Vol${injVolume}uL_Flow${flowRate.toFixed(1)}_${timestamp}.csv`;
+      }
+
+      // Package file blob
       const blob = new Blob([csvContent], { type: 'text/csv' });
-      const file = new File([blob], filename, { type: 'text/csv' });
+      const fileToUpload = new File([blob], filename, { type: 'text/csv' });
 
-      // Ingest synthesized file
-      const uploadRes = await uploadFile(file);
-
-      // Run animated pipeline steps
+      // Upload and trigger animated 6-phase analytical pipeline
+      const uploadRes = await uploadFile(fileToUpload);
       await executePipelineWithProgress(uploadRes);
+
     } catch (err) {
-      setErrorMessage(err.message || 'Simulation execution encountered an error.');
+      setErrorMessage(err.message || 'Analytical pipeline execution failed.');
       setProcessing(false);
       setCurrentStep(0);
     }
   };
 
-  // 2. Manual Upload File Handlers
+  // File Drag & Select Handlers
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -237,30 +285,8 @@ export default function HomePage() {
 
   const handleClearFile = () => {
     setSelectedFile(null);
-    setPreviewData(null);
-  };
-
-  const handleRunManualUpload = async () => {
-    if (!selectedFile) return;
-    setProcessing(true);
-    setErrorMessage('');
-    try {
-      const uploadRes = await uploadFile(selectedFile);
-      await executePipelineWithProgress(uploadRes);
-    } catch (err) {
-      setErrorMessage(err.message || 'File ingestion failed.');
-      setProcessing(false);
-      setCurrentStep(0);
-    }
-  };
-
-  // Unified Single Master Action
-  const handleExecuteMaster = () => {
-    if (selectedFile) {
-      handleRunManualUpload();
-    } else {
-      handleRunSimulator();
-    }
+    setRawHeaders([]);
+    setRawRows([]);
   };
 
   return (
@@ -272,20 +298,22 @@ export default function HomePage() {
           <span>Core Analytical Studio</span>
         </div>
         <p className={styles.headerDesc}>
-          Simulate synthetic runs via tactile parameter faders or ingest real instrument chromatograms in a single unified workspace.
+          Simulate synthetic runs via tactile parameter faders and ingest real instrument chromatograms with live fader coupling.
         </p>
       </div>
 
       {/* Main Single Page Unified Grid */}
       <div className={styles.unifiedGrid}>
-        {/* Left Column: Parameter Faders Simulator (Image 2 Sizing Reduced) */}
+        {/* Left Column: Parameter Faders Simulator */}
         <div className={styles.simulatorCard}>
           <div className={styles.cardHeader}>
             <div className={styles.cardTitleGroup}>
               <Sliders size={18} className={styles.goldIcon} />
               <div>
                 <h2 className={styles.cardTitle}>Chromatographic Parameter Faders</h2>
-                <span className={styles.cardSubtitle}>Dial in physical kinetics & instrument parameters</span>
+                <span className={styles.cardSubtitle}>
+                  {selectedFile ? 'Dynamic parameters actively applied to dataset' : 'Dial in physical kinetics & instrument parameters'}
+                </span>
               </div>
             </div>
 
@@ -456,7 +484,7 @@ export default function HomePage() {
               <div>
                 <h2 className={styles.cardTitle}>Manual File Ingestion</h2>
                 <span className={styles.cardSubtitle}>
-                  {selectedFile ? 'Parsed Dataset Preview & Ingestion' : 'Raw instrument exports (.csv / .xlsx)'}
+                  {selectedFile ? 'Parsed Dataset (Live Parameters Applied)' : 'Raw instrument exports (.csv / .xlsx)'}
                 </span>
               </div>
             </div>
@@ -508,25 +536,25 @@ export default function HomePage() {
                 <div className={styles.fileDetails}>
                   <span className={styles.fileName}>{selectedFile.name}</span>
                   <span className={styles.fileSize}>
-                    {(selectedFile.size / 1024).toFixed(1)} KB &bull; {previewData?.totalRows || 'Canonical'} rows detected
+                    {(selectedFile.size / 1024).toFixed(1)} KB &bull; {rawRows.length} rows &bull; <strong className={styles.activePillHighlight}>Parameters Synced</strong>
                   </span>
                 </div>
               </div>
 
-              {/* Live Interactive Data Table Preview */}
+              {/* Live Interactive Data Table Preview Modulated by Faders */}
               <div className={styles.previewTableWrapper}>
-                {previewData && previewData.headers.length > 0 ? (
+                {rawHeaders.length > 0 && modulatedPreviewRows.length > 0 ? (
                   <div className={styles.tableScroll}>
                     <table className={styles.previewTable}>
                       <thead>
                         <tr>
-                          {previewData.headers.map((h, i) => (
+                          {rawHeaders.map((h, i) => (
                             <th key={i}>{h}</th>
                           ))}
                         </tr>
                       </thead>
                       <tbody>
-                        {previewData.rows.map((row, rIdx) => (
+                        {modulatedPreviewRows.map((row, rIdx) => (
                           <tr key={rIdx}>
                             {row.map((cell, cIdx) => (
                               <td key={cIdx}>{cell}</td>
@@ -562,31 +590,33 @@ export default function HomePage() {
           {selectedFile ? (
             <>
               <FileSpreadsheet size={15} className={styles.goldIcon} />
-              <span>Target: Ingesting Uploaded File &bull; <strong>{selectedFile.name}</strong></span>
+              <span>
+                Ingesting: <strong>{selectedFile.name}</strong> + Modulating with <strong>{injVolume}&mu;L, {flowRate.toFixed(2)}mL/min, {columnTemp}&deg;C</strong>
+              </span>
             </>
           ) : (
             <>
               <Sliders size={15} className={styles.goldIcon} />
-              <span>Target: Synthetic Run &bull; <strong>{injVolume}&mu;L, {flowRate.toFixed(2)}mL/min, {columnTemp}&deg;C</strong></span>
+              <span>
+                Synthetic Run: <strong>{injVolume}&mu;L, {flowRate.toFixed(2)}mL/min, {columnTemp}&deg;C, {impurityRatio}% Impurity</strong>
+              </span>
             </>
           )}
         </div>
 
         <div className={styles.masterBtnGroup}>
-          {!selectedFile && (
-            <button
-              onClick={handleResetSliders}
-              className={styles.resetBtn}
-              type="button"
-              disabled={processing}
-              title="Reset parameters to standard QC defaults"
-            >
-              <RotateCcw size={13} /> Reset Parameters
-            </button>
-          )}
+          <button
+            onClick={handleResetSliders}
+            className={styles.resetBtn}
+            type="button"
+            disabled={processing}
+            title="Reset parameters to standard QC defaults"
+          >
+            <RotateCcw size={13} /> Reset Parameters
+          </button>
 
           <button
-            onClick={handleExecuteMaster}
+            onClick={handleExecuteCombinedAnalysis}
             disabled={processing}
             className={styles.masterExecBtn}
             type="button"
@@ -594,12 +624,16 @@ export default function HomePage() {
             {processing ? (
               <>
                 <Activity size={16} className={styles.spin} />
-                <span>Executing Pipeline Engine...</span>
+                <span>Processing Combined Pipeline...</span>
               </>
             ) : (
               <>
                 <Play size={16} />
-                <span>{selectedFile ? 'Analyze Ingested Dataset' : 'Simulate & Execute Analytical Run'}</span>
+                <span>
+                  {selectedFile
+                    ? 'Analyze Ingested Dataset & Fader Parameters'
+                    : 'Simulate & Execute Analytical Run'}
+                </span>
               </>
             )}
           </button>

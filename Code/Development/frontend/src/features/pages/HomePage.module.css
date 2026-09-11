@@ -397,16 +397,18 @@
   min-width: 0;
 }
 
-.fileName {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--color-text);
-  word-break: break-all;
-}
-
 .fileSize {
   font-size: 0.66rem;
   color: var(--color-muted);
+}
+
+.activePillHighlight {
+  color: #34d399;
+  font-size: 0.64rem;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
 /* Live Table Preview */
