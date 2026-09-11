@@ -21,7 +21,7 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
 
     const traces = [];
 
-    // Normal Peaks trace
+    // Normal Peaks trace (Champagne / Gold)
     if (normalPeaks.length > 0) {
       traces.push({
         x: normalPeaks.map((p) => p.retention_time),
@@ -33,22 +33,22 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
         hoverinfo: 'text',
         mode: 'markers+text',
         type: 'scatter',
-        name: 'Normal Peak',
+        name: 'Standard Peak',
         textposition: 'top center',
         textfont: {
           family: 'Inter, sans-serif',
           size: 10,
-          color: '#cbd5e1',
+          color: '#f3ebdc',
         },
         marker: {
-          color: '#38bdf8',
+          color: '#eedbbb',
           size: 10,
-          line: { color: '#0284c7', width: 1.5 },
+          line: { color: '#c5a059', width: 1.5 },
         },
       });
     }
 
-    // Anomaly Peaks trace
+    // Anomaly Peaks trace (Ruby with Gold Rim)
     if (anomalyPeaks.length > 0) {
       traces.push({
         x: anomalyPeaks.map((p) => p.retention_time),
@@ -69,9 +69,9 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
         },
         marker: {
           color: '#ef4444',
-          size: 14,
+          size: 13,
           symbol: 'diamond',
-          line: { color: '#ffffff', width: 2 },
+          line: { color: '#eedbbb', width: 2 },
         },
       });
     }
@@ -86,7 +86,7 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
         x1: p.retention_time,
         y1: p.intensity,
         line: {
-          color: isAnom ? 'rgba(239, 68, 68, 0.6)' : 'rgba(56, 189, 248, 0.4)',
+          color: isAnom ? 'rgba(239, 68, 68, 0.7)' : 'rgba(238, 219, 187, 0.45)',
           width: isAnom ? 2 : 1.5,
           dash: 'dot',
         },
@@ -95,33 +95,33 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
 
     const layout = {
       paper_bgcolor: 'transparent',
-      plot_bgcolor: 'rgba(15, 23, 42, 0.4)',
-      margin: { t: 30, r: 30, b: 50, l: 60 },
+      plot_bgcolor: 'rgba(20, 17, 12, 0.45)',
+      margin: { t: 25, r: 25, b: 45, l: 55 },
       showlegend: false,
       xaxis: {
         title: {
           text: 'Retention Time (min)',
-          font: { family: 'Inter, sans-serif', size: 12, color: '#94a3b8' },
+          font: { family: 'Inter, sans-serif', size: 11, color: '#c9bda8' },
         },
-        gridcolor: 'rgba(255, 255, 255, 0.06)',
-        zerolinecolor: 'rgba(255, 255, 255, 0.1)',
-        tickfont: { family: 'JetBrains Mono, monospace', size: 10, color: '#94a3b8' },
+        gridcolor: 'rgba(238, 219, 187, 0.08)',
+        zerolinecolor: 'rgba(238, 219, 187, 0.15)',
+        tickfont: { family: 'JetBrains Mono, monospace', size: 10, color: '#c9bda8' },
       },
       yaxis: {
         title: {
           text: 'Intensity (mAU)',
-          font: { family: 'Inter, sans-serif', size: 12, color: '#94a3b8' },
+          font: { family: 'Inter, sans-serif', size: 11, color: '#c9bda8' },
         },
-        gridcolor: 'rgba(255, 255, 255, 0.06)',
-        zerolinecolor: 'rgba(255, 255, 255, 0.1)',
-        tickfont: { family: 'JetBrains Mono, monospace', size: 10, color: '#94a3b8' },
+        gridcolor: 'rgba(238, 219, 187, 0.08)',
+        zerolinecolor: 'rgba(238, 219, 187, 0.15)',
+        tickfont: { family: 'JetBrains Mono, monospace', size: 10, color: '#c9bda8' },
       },
       shapes,
       autosize: true,
       hoverlabel: {
-        bgcolor: '#1e293b',
-        bordercolor: '#475569',
-        font: { family: 'Inter, sans-serif', size: 11, color: '#f8fafc' },
+        bgcolor: '#1c1811',
+        bordercolor: '#eedbbb',
+        font: { family: 'Inter, sans-serif', size: 11, color: '#fcfaf1' },
       },
     };
 
@@ -153,7 +153,7 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.title}>
-          <Activity size={18} color="#38bdf8" />
+          <Activity size={18} color="#eedbbb" />
           <span>Interactive Chromatogram</span>
         </div>
         <div className={styles.legend}>

@@ -20,15 +20,15 @@ import { getHistory } from '../../api/history';
 import { getGraphData } from '../../api/graph';
 import styles from './GraphPage.module.css';
 
-// Pre-defined demo node palette for standalone ontology exploration
+// Pre-defined luxury gold & velvet node palette for ontology exploration
 const NODE_COLORS = {
-  Sample: { bg: '#3b82f6', border: '#60a5fa', text: '#eff6ff' },
-  Peak: { bg: '#6366f1', border: '#818cf8', text: '#eef2ff' },
+  Sample: { bg: '#c5a059', border: '#eedbbb', text: '#0c0a07' },
+  Peak: { bg: '#8c6d3b', border: '#f9f1d7', text: '#fcfaf1' },
   Compound: { bg: '#10b981', border: '#34d399', text: '#ecfdf5' },
-  Batch: { bg: '#8b5cf6', border: '#a78bfa', text: '#f5f3ff' },
-  Anomaly: { bg: '#ef4444', border: '#f87171', text: '#fef2f2' },
-  Operator: { bg: '#f59e0b', border: '#fbbf24', text: '#fffbeb' },
-  Standard: { bg: '#06b6d4', border: '#22d3ee', text: '#ecfeff' },
+  Batch: { bg: '#d4af37', border: '#f9f1d7', text: '#0c0a07' },
+  Anomaly: { bg: '#ef4444', border: '#eedbbb', text: '#fef2f2' },
+  Operator: { bg: '#92400e', border: '#eedbbb', text: '#fffbeb' },
+  Standard: { bg: '#eedbbb', border: '#c5a059', text: '#0c0a07' },
 };
 
 export default function GraphPage() {
@@ -251,7 +251,7 @@ export default function GraphPage() {
                       y1={src.y || 100}
                       x2={tgt.x || 200}
                       y2={tgt.y || 200}
-                      stroke={isSelected ? '#6366f1' : 'rgba(255, 255, 255, 0.15)'}
+                      stroke={isSelected ? '#eedbbb' : 'rgba(238, 219, 187, 0.15)'}
                       strokeWidth={isSelected ? 2.5 : 1.2}
                       strokeDasharray={edge.label.includes('FLAGGED') ? '4 4' : 'none'}
                       markerEnd="url(#arrow)"
@@ -259,7 +259,7 @@ export default function GraphPage() {
                     <text
                       x={((src.x || 100) + (tgt.x || 200)) / 2}
                       y={((src.y || 100) + (tgt.y || 200)) / 2 - 5}
-                      fill={isSelected ? '#a5b4fc' : '#64748b'}
+                      fill={isSelected ? '#f9f1d7' : '#8a7c68'}
                       fontSize="9"
                       fontFamily="var(--font-mono)"
                       textAnchor="middle"

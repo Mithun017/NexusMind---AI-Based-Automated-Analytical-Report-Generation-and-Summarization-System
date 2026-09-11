@@ -42,7 +42,8 @@
   width: 8px;
   height: 8px;
   border-radius: var(--radius-full);
-  background-color: #38bdf8;
+  background-color: var(--color-gold-sand);
+  box-shadow: 0 0 6px rgba(238, 219, 187, 0.5);
 }
 
 .dotAnomaly {
