@@ -1,0 +1,149 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.tableWrapper {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+.table th {
+  background: rgba(255, 255, 255, 0.04);
+  padding: var(--space-md);
+  color: var(--color-muted);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table td {
+  padding: var(--space-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--color-text-secondary);
+}
+
+.table tr:hover td {
+  background: var(--color-surface-hover);
+}
+
+.formatBadge {
+  padding: 3px 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--color-accent-2);
+}
+
+.statusComplete {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-success);
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.btnAction {
+  padding: 6px 12px;
+  min-height: 44px; /* Touch target min 44px */
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+
+.btnAction:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-accent);
+}
+
+/* Mobile cards per Master_prompt §14 */
+.mobileCards {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.mobileCard {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.cardLabel {
+  color: var(--color-muted);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.pageBtn {
+  padding: 6px 14px;
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .tableWrapper {
+    display: none;
+  }
+  .mobileCards {
+    display: flex;
+  }
+}

@@ -1,0 +1,117 @@
+.container {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.aiBadge {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(6, 182, 212, 0.2));
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: #a5b4fc;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.disclaimer {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  font-style: italic;
+  margin-bottom: var(--space-md);
+}
+
+.btnGenerate {
+  background: var(--color-gradient-primary);
+  color: white;
+  padding: 0 var(--space-lg);
+  height: 44px; /* Touch target min 44px */
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+}
+
+.btnGenerate:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btnGenerate:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  animation: fadeIn var(--transition-fast);
+}
+
+.interpretationCard {
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.sectionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.sectionTitle {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-accent-2);
+}
+
+.bulletList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: 0.88rem;
+  color: var(--color-text-secondary);
+}
+
+.bulletItem {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+}
+
+.bulletDot {
+  color: var(--color-accent);
+  font-weight: bold;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}

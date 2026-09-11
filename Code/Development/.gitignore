@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node / React
+node_modules/
+dist/
+.vite/
+*.log
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+
+# Storage directories (when running locally)
+uploads/
+reports/
+backend/uploads/
+backend/reports/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,113 @@
+.container {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+.table th {
+  background: rgba(255, 255, 255, 0.04);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--color-muted);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  user-select: none;
+}
+
+.table th:hover {
+  color: var(--color-text);
+}
+
+.table td {
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--color-text-secondary);
+}
+
+.table tr:hover td {
+  background: var(--color-surface-hover);
+}
+
+.peakIdBadge {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--color-accent-2);
+}
+
+.monoVal {
+  font-family: var(--font-mono);
+}
+
+.anomalyRow td {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* Mobile stacked cards per Master_prompt §14 */
+.mobileCards {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.mobileCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.cardRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.cardLabel {
+  color: var(--color-muted);
+}
+
+@media (max-width: 768px) {
+  .tableWrapper {
+    display: none;
+  }
+  .mobileCards {
+    display: flex;
+  }
+}

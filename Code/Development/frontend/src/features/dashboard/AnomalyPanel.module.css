@@ -1,0 +1,111 @@
+.container {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.badge {
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badgeConfirmed {
+  background: var(--color-anomaly-bg);
+  color: var(--color-anomaly);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.badgeNormal {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-md);
+}
+
+.anomalyCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  transition: all var(--transition-fast);
+}
+
+.anomalyCard:hover {
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xs);
+}
+
+.peakId {
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-mono);
+}
+
+.score {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.scoreValue {
+  font-weight: 700;
+  color: var(--color-anomaly);
+  font-family: var(--font-mono);
+}
+
+.featureList {
+  margin-top: var(--space-xs);
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--color-border);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.featureVal {
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+}
+
+.emptyState {
+  text-align: center;
+  padding: var(--space-lg);
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}

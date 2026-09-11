@@ -1,0 +1,82 @@
+.navbar {
+  height: 64px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.menuBtn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px; /* 44px touch target */
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.menuBtn:hover {
+  background: var(--color-surface-hover);
+}
+
+.pageTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.healthBadge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.healthDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+}
+
+.dotGreen {
+  background-color: var(--color-success);
+  box-shadow: 0 0 6px var(--color-success);
+}
+
+.dotRed {
+  background-color: var(--color-anomaly);
+}
+
+@media (max-width: 768px) {
+  .menuBtn {
+    display: flex;
+  }
+  .navbar {
+    padding: 0 var(--space-md);
+  }
+}
