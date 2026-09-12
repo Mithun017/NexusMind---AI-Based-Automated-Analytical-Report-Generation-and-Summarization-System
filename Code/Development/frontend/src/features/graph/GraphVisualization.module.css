@@ -1,65 +1,177 @@
-.container {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-md);
-  margin-bottom: var(--space-lg);
+.threeCanvasWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 560px;
+  background: radial-gradient(circle at 50% 50%, #15110a 0%, #0c0a07 60%, #060503 100%);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid rgba(238, 219, 187, 0.16);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9), 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
-.header {
+.webglContainer {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.webglContainer:active {
+  cursor: grabbing;
+}
+
+/* Floating 3D Control Bar */
+.floatingControls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-md);
+  gap: 8px;
+  background: rgba(18, 15, 10, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(238, 219, 187, 0.22);
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+  z-index: 10;
 }
 
-.title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-text);
-  display: flex;
+.controlBtn {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-sm);
-}
-
-.graphArea {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--space-md);
-  padding: var(--space-sm) 0;
-}
-
-.entityCard {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
+  gap: 6px;
+  background: rgba(238, 219, 187, 0.06);
+  border: 1px solid rgba(238, 219, 187, 0.14);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-full);
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-.entityCard:hover {
-  border-color: var(--color-accent-2);
-  transform: translateY(-2px);
+.controlBtn:hover {
+  background: rgba(238, 219, 187, 0.18);
+  border-color: rgba(238, 219, 187, 0.4);
+  color: var(--color-gold-sand);
+  transform: translateY(-1px);
 }
 
-.entityType {
-  font-size: 0.72rem;
+.activeBtn {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(238, 219, 187, 0.15) 100%);
+  border-color: var(--color-gold-sand);
+  color: var(--color-gold-sand);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+}
+
+/* 3D Hover Tooltip */
+.hoverTooltip3D {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(12, 10, 7, 0.94);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(238, 219, 187, 0.35);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  color: #fff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.9), 0 0 20px rgba(212, 175, 55, 0.2);
+  z-index: 20;
+  min-width: 170px;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.tooltipHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.tooltipDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.tooltipType {
+  font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--color-accent-2);
+  letter-spacing: 0.08em;
+  color: var(--color-gold-sand);
 }
 
-.entityLabel {
-  font-weight: 600;
-  font-size: 0.95rem;
+.tooltipTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
   color: var(--color-text);
+  margin-bottom: 6px;
 }
 
-.entityMeta {
-  font-size: 0.78rem;
+.tooltipProps {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-top: 1px solid rgba(238, 219, 187, 0.12);
+  padding-top: 6px;
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.7rem;
+}
+
+.propKey {
   color: var(--color-muted);
+  text-transform: capitalize;
+}
+
+.propVal {
+  color: var(--color-gold-sand);
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+/* 3D Universe Stats HUD */
+.universeStats {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(12, 10, 7, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(238, 219, 187, 0.16);
+  border-radius: var(--radius-full);
+  padding: 5px 14px;
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.statDivider {
+  color: rgba(238, 219, 187, 0.3);
+}
+
+.goldText {
+  color: var(--color-gold-sand);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
