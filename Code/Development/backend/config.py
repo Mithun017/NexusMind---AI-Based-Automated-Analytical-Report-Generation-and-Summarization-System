@@ -1,18 +1,20 @@
+from pathlib import Path
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+_ENV_PATH = Path(__file__).resolve().parent / ".env"
 
 class Settings(BaseSettings):
     # Database
-    mongo_uri: str = "mongodb://mongodb:27017"
+    mongo_uri: str = "mongodb://localhost:27017"
     mongo_db_name: str = "nexusmind"
-    neo4j_uri: str = "bolt://neo4j:7687"
+    neo4j_uri: str = "bolt://localhost:7687"
     neo4j_user: str = "neo4j"
     neo4j_password: str = "changeme"
 
     # LLM — model names come from env, never hardcoded in provider classes
     groq_api_key: str = ""
-    groq_model: str = "llama-3.3-70b-versatile"
+    groq_model: str = "openai/gpt-oss-20b"
     groq_models: str = "openai/gpt-oss-20b,llama-3.3-70b-versatile,llama-3.1-8b-instant,llama3-70b-8192"
     
     openrouter_api_key: str = ""
@@ -57,7 +59,10 @@ class Settings(BaseSettings):
         """Parse CORS_ALLOWED_ORIGINS env var into a list for CORSMiddleware."""
         return [o.strip() for o in self.cors_allowed_origins.split(",") if o.strip()]
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=str(_ENV_PATH) if _ENV_PATH.exists() else ".env",
+        extra="ignore",
+    )
 
 
 @lru_cache()
