@@ -719,14 +719,16 @@ export default function HomePage() {
 
         {/* Steps Track with Progress Beam */}
         <div className={styles.stepsTrack}>
-          {/* Background and active glowing connection line */}
-          <div className={styles.connectingLineBg} />
-          <div
-            className={styles.connectingLineActive}
-            style={{
-              width: currentStep === 0 ? '0%' : `${((currentStep - 1) / 5) * 100}%`,
-            }}
-          />
+          {/* Background and active glowing connection line strictly bounded between Step 1 and Step 6 */}
+          <div className={styles.connectingLineTrack}>
+            <div className={styles.connectingLineBg} />
+            <div
+              className={styles.connectingLineActive}
+              style={{
+                width: currentStep <= 1 ? '0%' : `${Math.min(100, ((currentStep - 1) / 5) * 100)}%`,
+              }}
+            />
+          </div>
 
           {PIPELINE_STEPS.map((step) => {
             const isCompleted = currentStep > step.id;
