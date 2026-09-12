@@ -23,7 +23,7 @@ class AnalyticalResult(BaseModel):
     max_area: float
     avg_intensity: float
     total_area: float
-    peak_details: List[PeakDetail]
+    peak_details: List[Dict[str, Any]]
 
 
 class AnalyticalEngine:
@@ -68,7 +68,6 @@ class AnalyticalEngine:
             sorted_rt = np.sort(df["retention_time"].values)
             diffs = np.diff(sorted_rt)
             min_diff = float(np.min(diffs)) if len(diffs) > 0 else 0.5
-            # resolution factor from min separation (e.g. >= 0.2 min separation gets max score)
             resolution_factor = min(1.0, max(0.4, min_diff / 0.2))
         else:
             resolution_factor = 0.9
@@ -77,18 +76,18 @@ class AnalyticalEngine:
         quality_score = min(100.0, max(0.0, quality_score))
 
         records = df.to_dict("records")
-        peak_details: List[PeakDetail] = [
-            PeakDetail(
-                peak_id=str(r.get("peak_id", f"PK-{idx+1:03d}")),
-                retention_time=round(float(r.get("retention_time", 0.0)), 3),
-                peak_area=round(float(r.get("peak_area", 0.0)), 2),
-                peak_height=round(float(r.get("peak_height", 0.0)), 2),
-                intensity=round(float(r.get("intensity", 0.0)), 2),
-                concentration=round(float(r.get("concentration", 0.0)), 4),
-                compound_name=str(r.get("compound_name", "Unknown")),
-                relative_abundance=round(float(r.get("relative_abundance", 0.0)), 2),
-                snr=round(float(r.get("snr", 0.0)), 2),
-            )
+        peak_details: List[Dict[str, Any]] = [
+            {
+                "peak_id": str(r.get("peak_id", f"PK-{idx+1:03d}")),
+                "retention_time": round(float(r.get("retention_time", 0.0)), 3),
+                "peak_area": round(float(r.get("peak_area", 0.0)), 2),
+                "peak_height": round(float(r.get("peak_height", 0.0)), 2),
+                "intensity": round(float(r.get("intensity", 0.0)), 2),
+                "concentration": round(float(r.get("concentration", 0.0)), 4),
+                "compound_name": str(r.get("compound_name", "Unknown")),
+                "relative_abundance": round(float(r.get("relative_abundance", 0.0)), 2),
+                "snr": round(float(r.get("snr", 0.0)), 2),
+            }
             for idx, r in enumerate(records)
         ]
 

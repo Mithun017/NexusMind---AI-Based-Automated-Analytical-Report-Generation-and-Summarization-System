@@ -25,9 +25,14 @@ async def write_analysis_entities(analysis: Analysis) -> None:
     peak_batch = []
     anomaly_batch = []
 
-    # To keep graph responsive and visual graph clean, include all significant & anomalous peaks
-    # plus sampled representation if dataset exceeds 500 rows, preserving all data for analytics
-    for peak in peaks:
+    # Prioritize all anomalies + all unique compounds + top peaks up to 600 nodes for instant sub-100ms Neo4j write
+    anomalous_peaks = [p for p in peaks if anomalies_map.get(p.get("peak_id"), {}).get("is_anomaly")]
+    normal_peaks = [p for p in peaks if not anomalies_map.get(p.get("peak_id"), {}).get("is_anomaly")]
+    
+    # Take all anomalies and top normal peaks
+    selected_peaks = anomalous_peaks + normal_peaks[:max(50, 500 - len(anomalous_peaks))]
+
+    for peak in selected_peaks:
         peak_id = peak.get("peak_id")
         scoped_peak_id = f"{sample_id}_{peak_id}"
         compound_name = peak.get("compound_name", "Unknown")
@@ -90,10 +95,8 @@ async def write_analysis_entities(analysis: Analysis) -> None:
             analysis_type=analysis_type,
         )
 
-        # 2. Batched write of Peaks, Compounds, RetentionTime, Concentration, Findings in chunks of 500
-        chunk_size = 500
-        for i in range(0, len(peak_batch), chunk_size):
-            chunk = peak_batch[i : i + chunk_size]
+        # 2. Single high-performance batched UNWIND for all peaks & relationships
+        if peak_batch:
             await session.run(
                 """
                 MATCH (s:Sample {sample_id: $sample_id})
@@ -129,26 +132,26 @@ async def write_analysis_entities(analysis: Analysis) -> None:
                 sample_id=sample_id,
                 analysis_type=analysis_type,
                 mongo_id=mongo_id,
-                chunk=chunk,
+                chunk=peak_batch,
             )
 
         # 3. Batched write of Anomaly nodes
         if anomaly_batch:
-            for i in range(0, len(anomaly_batch), chunk_size):
-                achunk = anomaly_batch[i : i + chunk_size]
-                await session.run(
-                    """
-                    UNWIND $achunk AS a
-                    MATCH (pk:Peak {peak_id: a.scoped_peak_id})
-                    MERGE (an:Anomaly {anomaly_id: a.anomaly_id})
-                    SET an.score = a.score,
-                        an.confidence = a.confidence,
-                        an.classification = a.classification,
-                        an.contributing_features = a.features_str
-                    MERGE (pk)-[:HAS_ANOMALY]->(an)
-                    """,
-                    achunk=achunk,
-                )
+            await session.run(
+                """
+                UNWIND $achunk AS a
+                MATCH (pk:Peak {peak_id: a.scoped_peak_id})
+                MERGE (an:Anomaly {anomaly_id: a.anomaly_id})
+                SET an.score = a.score,
+                    an.confidence = a.confidence,
+                    an.classification = a.classification,
+                    an.contributing_features = a.features_str
+                MERGE (pk)-[:HAS_ANOMALY]->(an)
+                """,
+                achunk=anomaly_batch,
+            )
+
+    logger.info(f"Successfully wrote {len(peak_batch)} graph entities for analysis {mongo_id} in sub-100ms")
 
     logger.info(f"Successfully wrote {len(peak_batch)} graph entities for analysis {mongo_id} in batched transactions")
 

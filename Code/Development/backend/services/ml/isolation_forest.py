@@ -23,7 +23,8 @@ class IsolationForestDetector(AnomalyDetector):
         self.model = IsolationForest(
             contamination=contamination,
             random_state=self.settings.ml_random_state,
-            n_estimators=100,
+            n_estimators=50,
+            n_jobs=-1,
         )
 
     def fit(self, df: pd.DataFrame) -> None:
@@ -52,7 +53,7 @@ class IsolationForestDetector(AnomalyDetector):
         normalized = 1.0 - (scores - min_s) / denom
         labels = self.model.predict(X)
 
-        results: List[AnomalyResult] = []
+        results: List[Dict[str, Any]] = []
         records = df_aligned.to_dict("records")
         for pos, row in enumerate(records):
             score = float(normalized[pos])
@@ -70,16 +71,14 @@ class IsolationForestDetector(AnomalyDetector):
                 f: round(float(row.get(f, 0.0)), 4) for f in self.FEATURES
             }
 
-            results.append(
-                AnomalyResult(
-                    peak_id=str(row.get("peak_id", f"PK-{pos+1:03d}")),
-                    retention_time=round(float(row.get("retention_time", 0.0)), 3),
-                    anomaly_score=round(score, 4),
-                    is_anomaly=is_anomaly,
-                    confidence=confidence,
-                    contributing_features=contributing_features,
-                    classification=classification,
-                )
-            )
+            results.append({
+                "peak_id": str(row.get("peak_id", f"PK-{pos+1:03d}")),
+                "retention_time": round(float(row.get("retention_time", 0.0)), 3),
+                "anomaly_score": round(score, 4),
+                "is_anomaly": is_anomaly,
+                "confidence": confidence,
+                "contributing_features": contributing_features,
+                "classification": classification,
+            })
 
         return results

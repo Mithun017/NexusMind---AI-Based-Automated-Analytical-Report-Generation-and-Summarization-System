@@ -216,7 +216,7 @@ export default function HomePage() {
     });
   }, [rawRows, rawHeaders, flowRate, injVolume, noiseLevel, impurityRatio]);
 
-  // Animate pipeline execution across 6 steps with glowing state transitions
+  // Animate pipeline execution across 6 steps with glowing state transitions (sub-2.5s total)
   const executePipelineWithProgress = async (uploadRes) => {
     setErrorMessage('');
     
@@ -227,22 +227,22 @@ export default function HomePage() {
     // Start backend analysis call immediately
     const analysisPromise = runAnalysis(uploadRes.upload_id);
     
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 160));
 
     // Step 2: Preprocess
     setCurrentStep(2);
     setStatusMessage('Step 2/6: Preprocessing chromatographic signals, noise reduction & baseline correction...');
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 160));
 
     // Step 3: Analytics
     setCurrentStep(3);
     setStatusMessage('Step 3/6: Extracting deterministic peak KPIs, retention times & USP resolution...');
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 160));
 
     // Step 4: ML Anomaly
     setCurrentStep(4);
     setStatusMessage('Step 4/6: Executing Isolation Forest ML anomaly scoring & outlier detection...');
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 160));
 
     // Step 5: Knowledge Graph
     setCurrentStep(5);
@@ -260,7 +260,7 @@ export default function HomePage() {
     // Step 6: PDF Report & Dashboard Ready
     setCurrentStep(6);
     setStatusMessage('Step 6/6: Synthesizing compliance summary & analytical dashboard ready...');
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 180));
 
     // Complete & Navigate with preloaded state for 0ms instant dashboard presentation
     navigate(`/dashboard/${analysisRes.analysis_id}`, {
@@ -277,20 +277,17 @@ export default function HomePage() {
     setErrorMessage('');
 
     try {
-      let csvContent = '';
       const timestamp = Date.now();
-      let filename = '';
+      let fileToUpload = null;
 
       if (selectedFile && rawHeaders.length > 0 && modulatedPreviewRows.length > 0) {
-        // 1. Build CSV from uploaded dataset modulated by the live faders
-        csvContent = rawHeaders.join(',') + '\n';
-        modulatedPreviewRows.forEach(row => {
-          csvContent += row.join(',') + '\n';
-        });
-        filename = `Ingested_${timestamp}.csv`;
+        // Build CSV efficiently from raw headers + modulated rows
+        const csvContent = rawHeaders.join(',') + '\n' + modulatedPreviewRows.map(r => r.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        fileToUpload = new File([blob], `Ingested_${timestamp}.csv`, { type: 'text/csv' });
       } else {
-        // 2. Synthesize complete standard analytical dataset from current faders
-        csvContent = 'Sample ID,Retention Time,Peak Area,Peak Height,Intensity,Concentration,Compound Name,Analysis Type\n';
+        // Synthesize complete standard analytical dataset from current faders
+        let csvContent = 'Sample ID,Retention Time,Peak Area,Peak Height,Intensity,Concentration,Compound Name,Analysis Type\n';
         const compounds = [
           { name: 'Uracil (Void Marker)', tr: 1.25 / flowRate, area: 12450 * (injVolume / 25), height: 3200 * (injVolume / 25), conc: 0.0125 },
           { name: 'Acetaminophen', tr: 2.80 / flowRate, area: 45800 * (injVolume / 25), height: 8900 * (injVolume / 25), conc: 0.0458 },
@@ -307,12 +304,9 @@ export default function HomePage() {
           const finalIntensity = Math.max(10, comp.height + noise);
           csvContent += `SMP-001,${comp.tr.toFixed(2)},${comp.area.toFixed(1)},${comp.height.toFixed(1)},${finalIntensity.toFixed(1)},${comp.conc.toFixed(4)},${comp.name},HPLC-UV/Vis\n`;
         });
-        filename = `Sim_${timestamp}.csv`;
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        fileToUpload = new File([blob], `Sim_${timestamp}.csv`, { type: 'text/csv' });
       }
-
-      // Package file blob
-      const blob = new Blob([csvContent], { type: 'text/csv' });
-      const fileToUpload = new File([blob], filename, { type: 'text/csv' });
 
       // Upload and trigger animated 6-phase analytical pipeline
       const uploadRes = await uploadFile(fileToUpload);

@@ -86,8 +86,8 @@ async def run_analysis(
         sample_id=sample_id,
         status="complete",
         kpis=kpis_dict,
-        peak_details=[p.model_dump() for p in analytical_res.peak_details],
-        anomaly_results=[a.model_dump() for a in anomaly_res],
+        peak_details=analytical_res.peak_details,
+        anomaly_results=anomaly_res,
         kg_context={"sample_id": sample_id, "analysis_type": prep_meta["analysis_type"]},
     )
     await analysis_doc.insert()
