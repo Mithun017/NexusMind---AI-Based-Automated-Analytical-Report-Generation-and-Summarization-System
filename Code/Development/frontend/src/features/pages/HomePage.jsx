@@ -59,23 +59,23 @@ const PIPELINE_STEPS = [
   { id: 6, label: 'PDF Report', icon: FileText, desc: '21 CFR Part 11 PDF compilation' },
 ];
 
-// Dynamic multi-stop level gradient helper for all faders
+// Dynamic multi-stop luxury theme gradient helper for all parameter faders
 const getFaderGradient = (percent) => {
   if (percent > 75) {
     return {
-      background: 'linear-gradient(90deg, #10b981 0%, #f59e0b 40%, #ef4444 100%)',
-      boxShadow: '0 0 12px rgba(239, 68, 68, 0.7), inset 0 2px 2px rgba(255, 255, 255, 0.4)',
+      background: 'linear-gradient(90deg, #c5a059 0%, #f59e0b 45%, #ef4444 100%)',
+      boxShadow: '0 0 14px rgba(239, 68, 68, 0.7), inset 0 2px 2px rgba(255, 255, 255, 0.45)',
     };
   }
   if (percent > 45) {
     return {
-      background: 'linear-gradient(90deg, #10b981 0%, #d4af37 45%, #f59e0b 100%)',
-      boxShadow: '0 0 10px rgba(245, 158, 11, 0.65), inset 0 2px 2px rgba(255, 255, 255, 0.4)',
+      background: 'linear-gradient(90deg, #c5a059 0%, #d4af37 45%, #f59e0b 100%)',
+      boxShadow: '0 0 12px rgba(245, 158, 11, 0.65), inset 0 2px 2px rgba(255, 255, 255, 0.45)',
     };
   }
   return {
-    background: 'linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)',
-    boxShadow: '0 0 10px rgba(16, 185, 129, 0.55), inset 0 2px 2px rgba(255, 255, 255, 0.4)',
+    background: 'linear-gradient(90deg, #8c6d3b 0%, #c5a059 50%, #eedbbb 100%)',
+    boxShadow: '0 0 10px rgba(212, 175, 55, 0.5), inset 0 2px 2px rgba(255, 255, 255, 0.45)',
   };
 };
 
