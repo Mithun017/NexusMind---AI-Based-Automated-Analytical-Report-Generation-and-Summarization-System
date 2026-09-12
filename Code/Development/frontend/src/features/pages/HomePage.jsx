@@ -634,26 +634,33 @@ export default function HomePage() {
               {/* Live Interactive Data Table Preview Modulated by Faders */}
               <div className={styles.previewTableWrapper}>
                 {rawHeaders.length > 0 && modulatedPreviewRows.length > 0 ? (
-                  <div className={styles.tableScroll}>
-                    <table className={styles.previewTable}>
-                      <thead>
-                        <tr>
-                          {rawHeaders.map((h, i) => (
-                            <th key={i}>{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {modulatedPreviewRows.map((row, rIdx) => (
-                          <tr key={rIdx}>
-                            {row.map((cell, cIdx) => (
-                              <td key={cIdx}>{cell}</td>
+                  <>
+                    <div className={styles.tableScroll}>
+                      <table className={styles.previewTable}>
+                        <thead>
+                          <tr>
+                            {rawHeaders.map((h, i) => (
+                              <th key={i}>{h}</th>
                             ))}
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {modulatedPreviewRows.slice(0, 300).map((row, rIdx) => (
+                            <tr key={rIdx}>
+                              {row.map((cell, cIdx) => (
+                                <td key={cIdx}>{cell}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {modulatedPreviewRows.length > 300 && (
+                      <div className={styles.tableTruncateNote}>
+                        Showing first 300 of {modulatedPreviewRows.length.toLocaleString()} rows &bull; Full dataset will be analyzed
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className={styles.tablePlaceholder}>
                     <TableIcon size={20} className={styles.goldIcon} />

@@ -34,7 +34,10 @@
   box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  height: 490px;
+  max-height: 490px;
+  min-height: 0;
+  overflow: hidden;
   transition: border-color var(--transition-fast);
 }
 
@@ -52,6 +55,7 @@
   padding-bottom: 8px;
   border-bottom: 1px solid var(--color-border);
   margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .cardTitleGroup {
@@ -133,6 +137,9 @@
   flex-direction: column;
   gap: 7px;
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .volumeRow {
@@ -144,6 +151,7 @@
   border: 1px solid rgba(238, 219, 187, 0.08);
   border-radius: var(--radius-md);
   transition: border-color var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .volumeRow:hover {
@@ -264,7 +272,7 @@
 .dropzone {
   border: 2px dashed rgba(238, 219, 187, 0.25);
   border-radius: var(--radius-lg);
-  padding: var(--space-lg) var(--space-md);
+  padding: var(--space-md);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -273,8 +281,9 @@
   background: rgba(12, 10, 7, 0.35);
   cursor: pointer;
   transition: all var(--transition-normal);
-  min-height: 220px;
   flex: 1;
+  min-height: 0;
+  height: 100%;
 }
 
 .dropzone:hover,
@@ -329,13 +338,15 @@
 .selectedFileContainer {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   padding: 10px 12px;
   background: rgba(12, 10, 7, 0.55);
   border: 1px solid rgba(238, 219, 187, 0.2);
   border-radius: var(--radius-lg);
   flex: 1;
+  min-height: 0;
   height: 100%;
+  overflow: hidden;
   justify-content: flex-start;
 }
 
@@ -390,6 +401,7 @@
 /* Live Table Preview */
 .previewTableWrapper {
   flex: 1;
+  min-height: 0;
   width: 100%;
   background: rgba(8, 7, 5, 0.85);
   border: 1px solid rgba(238, 219, 187, 0.14);
@@ -404,6 +416,24 @@
   overflow-y: auto;
   width: 100%;
   flex: 1;
+  min-height: 0;
+  max-height: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(238, 219, 187, 0.25) transparent;
+}
+
+.tableScroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.tableScroll::-webkit-scrollbar-thumb {
+  background: rgba(238, 219, 187, 0.25);
+  border-radius: var(--radius-full);
+}
+
+.tableScroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(238, 219, 187, 0.45);
 }
 
 .previewTable {
@@ -444,6 +474,17 @@
   padding: 5px 10px;
   color: var(--color-text-secondary);
   font-family: var(--font-mono);
+}
+
+.tableTruncateNote {
+  padding: 3px 8px;
+  font-size: 0.64rem;
+  color: var(--color-gold-sand);
+  background: rgba(238, 219, 187, 0.08);
+  border-top: 1px solid rgba(238, 219, 187, 0.15);
+  text-align: center;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
 }
 
 .tablePlaceholder {
