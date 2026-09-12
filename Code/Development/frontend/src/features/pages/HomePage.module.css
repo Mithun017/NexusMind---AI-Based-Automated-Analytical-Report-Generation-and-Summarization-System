@@ -361,27 +361,28 @@
 .selectedFileContainer {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 8px 10px;
+  gap: 10px;
+  padding: 10px 12px;
   background: rgba(12, 10, 7, 0.55);
   border: 1px solid rgba(238, 219, 187, 0.2);
   border-radius: var(--radius-lg);
-  min-height: 220px;
   flex: 1;
-  justify-content: space-between;
+  height: 100%;
+  justify-content: flex-start;
 }
 
 .selectedFileInfo {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid rgba(238, 219, 187, 0.1);
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(238, 219, 187, 0.12);
+  flex-shrink: 0;
 }
 
 .fileIconBadge {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-sm);
   background: rgba(238, 219, 187, 0.12);
   display: flex;
@@ -397,8 +398,15 @@
   min-width: 0;
 }
 
+.fileName {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+  word-break: break-all;
+}
+
 .fileSize {
-  font-size: 0.66rem;
+  font-size: 0.68rem;
   color: var(--color-muted);
 }
 
@@ -414,10 +422,9 @@
 /* Live Table Preview */
 .previewTableWrapper {
   flex: 1;
-  min-height: 140px;
-  max-height: 175px;
-  background: rgba(8, 7, 5, 0.7);
-  border: 1px solid rgba(238, 219, 187, 0.12);
+  width: 100%;
+  background: rgba(8, 7, 5, 0.85);
+  border: 1px solid rgba(238, 219, 187, 0.14);
   border-radius: var(--radius-md);
   overflow: hidden;
   display: flex;
@@ -427,14 +434,14 @@
 .tableScroll {
   overflow-x: auto;
   overflow-y: auto;
-  max-height: 175px;
   width: 100%;
+  flex: 1;
 }
 
 .previewTable {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.66rem;
+  font-size: 0.68rem;
   text-align: left;
   white-space: nowrap;
 }
@@ -442,13 +449,14 @@
 .previewTable thead th {
   position: sticky;
   top: 0;
-  background: #19150e;
+  background: #1a160f;
   color: var(--color-gold-sand);
   font-weight: 600;
-  padding: 4px 8px;
-  border-bottom: 1px solid rgba(238, 219, 187, 0.2);
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(238, 219, 187, 0.25);
   font-family: var(--font-mono);
   letter-spacing: 0.02em;
+  z-index: 2;
 }
 
 .previewTable tbody tr {
@@ -456,12 +464,16 @@
   transition: background var(--transition-fast);
 }
 
+.previewTable tbody tr:nth-child(even) {
+  background: rgba(238, 219, 187, 0.02);
+}
+
 .previewTable tbody tr:hover {
   background: rgba(238, 219, 187, 0.08);
 }
 
 .previewTable tbody td {
-  padding: 3px 8px;
+  padding: 5px 10px;
   color: var(--color-text-secondary);
   font-family: var(--font-mono);
 }
