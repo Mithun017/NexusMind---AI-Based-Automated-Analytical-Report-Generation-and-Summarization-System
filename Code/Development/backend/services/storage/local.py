@@ -6,25 +6,38 @@ from services.storage.base import StorageBackend
 from core.exceptions import StorageError
 
 
+def _to_fs_path(p: Path) -> str:
+    """Resolve path and apply Windows extended-length prefix (\\\\?\\) if needed to bypass MAX_PATH 260 limit."""
+    resolved = str(p.resolve())
+    if os.name == "nt" and not resolved.startswith("\\\\?\\") and not resolved.startswith("//"):
+        return "\\\\?\\" + resolved
+    return resolved
+
+
 class LocalStorageBackend(StorageBackend):
     def __init__(self, base_dir: str):
         self.base_dir = Path(base_dir).resolve()
-        self.base_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            os.makedirs(_to_fs_path(self.base_dir), exist_ok=True)
+        except Exception:
+            self.base_dir.mkdir(parents=True, exist_ok=True)
 
     async def save(self, file_bytes: bytes, filename: str) -> str:
         try:
             # Guarantee the target directory exists
-            self.base_dir.mkdir(parents=True, exist_ok=True)
+            os.makedirs(_to_fs_path(self.base_dir), exist_ok=True)
             
-            # Sanitize filename for Windows & POSIX filesystem safety
+            # Sanitize and truncate filename for safety
             raw_name = Path(filename).name
-            clean_name = re.sub(r'[\\/*?:"<>|]', '_', raw_name)
-            unique_name = f"{uuid.uuid4().hex}_{clean_name}"
+            clean_name = re.sub(r'[\\/*?:"<>|\s]', '_', raw_name)
+            # Use short 8-character unique hash + clean name to keep paths compact
+            unique_name = f"{uuid.uuid4().hex[:8]}_{clean_name[:48]}"
             
             target_path = (self.base_dir / unique_name).resolve()
-            target_path.parent.mkdir(parents=True, exist_ok=True)
+            os.makedirs(_to_fs_path(target_path.parent), exist_ok=True)
             
-            with open(target_path, "wb") as f:
+            fs_path = _to_fs_path(target_path)
+            with open(fs_path, "wb") as f:
                 f.write(file_bytes)
             return str(target_path)
         except Exception as e:
@@ -42,7 +55,9 @@ class LocalStorageBackend(StorageBackend):
                         target_path = candidate
                     else:
                         raise StorageError(f"File not found at path '{path}'")
-            with open(target_path, "rb") as f:
+            
+            fs_path = _to_fs_path(target_path)
+            with open(fs_path, "rb") as f:
                 return f.read()
         except Exception as e:
             if isinstance(e, StorageError):

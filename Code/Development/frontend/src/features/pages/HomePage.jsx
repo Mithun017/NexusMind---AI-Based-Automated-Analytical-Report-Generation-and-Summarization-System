@@ -222,7 +222,7 @@ export default function HomePage() {
         modulatedPreviewRows.forEach(row => {
           csvContent += row.join(',') + '\n';
         });
-        filename = `Ingested_${selectedFile.name.replace(/\.[^/.]+$/, "")}_Vol${injVolume}uL_Flow${flowRate.toFixed(1)}_${timestamp}.csv`;
+        filename = `Ingested_${timestamp}.csv`;
       } else {
         // 2. Synthesize complete standard analytical dataset from current faders
         csvContent = 'Sample ID,Retention Time,Peak Area,Peak Height,Intensity,Concentration,Compound Name,Analysis Type\n';
@@ -242,7 +242,7 @@ export default function HomePage() {
           const finalIntensity = Math.max(10, comp.height + noise);
           csvContent += `SMP-001,${comp.tr.toFixed(2)},${comp.area.toFixed(1)},${comp.height.toFixed(1)},${finalIntensity.toFixed(1)},${comp.conc.toFixed(4)},${comp.name},HPLC-UV/Vis\n`;
         });
-        filename = `Simulated_Run_Vol${injVolume}uL_Flow${flowRate.toFixed(1)}_${timestamp}.csv`;
+        filename = `Sim_${timestamp}.csv`;
       }
 
       // Package file blob
