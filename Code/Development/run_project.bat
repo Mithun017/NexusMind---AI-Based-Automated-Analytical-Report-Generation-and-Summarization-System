@@ -15,6 +15,8 @@ set "FRONTEND_DIR=%SCRIPT_DIR%frontend"
 
 REM 1. Start Neo4j Knowledge Graph Engine via Docker (if Docker is active)
 echo [1/3] Initializing Neo4j Knowledge Graph Container...
+REM Free port 8000 from old external containers if present
+docker stop factoryos-chromadb >nul 2>&1
 docker start nexusmind-neo4j >nul 2>&1
 if %errorlevel% neq 0 (
     docker run -d --name nexusmind-neo4j -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/changeme -v nexusmind_neo4j_data:/data neo4j:5-community >nul 2>&1
