@@ -320,17 +320,6 @@ export default function HomePage() {
 
   return (
     <div className={styles.page}>
-      {/* Studio Header Bar */}
-      <div className={styles.topHeader}>
-        <div className={styles.headerBadge}>
-          <Sparkles size={14} />
-          <span>Core Analytical Studio</span>
-        </div>
-        <p className={styles.headerDesc}>
-          Simulate synthetic runs via tactile parameter faders and ingest real instrument chromatograms with live fader coupling.
-        </p>
-      </div>
-
       {/* Main Single Page Unified Grid */}
       <div className={styles.unifiedGrid}>
         {/* Left Column: Parameter Faders Simulator (7 Faders) */}
