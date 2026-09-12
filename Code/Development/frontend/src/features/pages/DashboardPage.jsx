@@ -217,8 +217,14 @@ export default function DashboardPage() {
       {/* 5. ML Anomaly Panel */}
       <AnomalyPanel anomalies={analysis.anomaly_results} />
 
-      {/* 6. Knowledge Graph Entity Network */}
-      {graphData && <GraphVisualization graphData={graphData} />}
+      {/* 6. 3D WebGL Knowledge Graph Entity Network */}
+      <GraphVisualization
+        graphData={graphData}
+        analysisId={currentId}
+        sampleId={analysis.sample_id || analysis.filename}
+        peaks={analysis.peak_details}
+        anomalies={analysis.anomaly_results}
+      />
 
       {/* 7. AI Analytical Reasoning & Summary Panel */}
       <AISummaryPanel

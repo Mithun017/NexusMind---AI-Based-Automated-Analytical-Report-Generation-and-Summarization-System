@@ -1,13 +1,150 @@
+.dashboardGraphCard {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition-normal);
+}
+
+.dashboardGraphCard:hover {
+  border-color: var(--color-border-glow);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+  padding: 0 var(--space-xs);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iconCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goldIcon {
+  color: #06b6d4;
+}
+
+.title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 0.72rem;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.layoutPills {
+  display: flex;
+  align-items: center;
+  background: rgba(14, 11, 7, 0.8);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  gap: 3px;
+}
+
+.layoutBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.layoutBtn:hover {
+  color: var(--color-gold-sand);
+  background: rgba(238, 219, 187, 0.06);
+}
+
+.activeLayoutBtn {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(238, 219, 187, 0.12) 100%);
+  color: var(--color-gold-sand);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+}
+
+.expandBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(238, 219, 187, 0.06);
+  border: 1px solid rgba(238, 219, 187, 0.2);
+  color: var(--color-gold-sand);
+  border-radius: var(--radius-full);
+  padding: 5px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.expandBtn:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--color-gold-sand);
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.externalIcon {
+  opacity: 0.7;
+}
+
+.embedded3DCanvas {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, #15110a 0%, #0c0a07 60%, #060503 100%);
+  border: 1px solid rgba(238, 219, 187, 0.14);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.85);
+}
+
 .threeCanvasWrapper {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 560px;
+  min-height: 460px;
   background: radial-gradient(circle at 50% 50%, #15110a 0%, #0c0a07 60%, #060503 100%);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  border: 1px solid rgba(238, 219, 187, 0.16);
-  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9), 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
 .webglContainer {
@@ -23,7 +160,7 @@
 /* Floating 3D Control Bar */
 .floatingControls {
   position: absolute;
-  bottom: 20px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -33,7 +170,7 @@
   backdrop-filter: blur(16px);
   border: 1px solid rgba(238, 219, 187, 0.22);
   border-radius: var(--radius-full);
-  padding: 6px 14px;
+  padding: 5px 12px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
   z-index: 10;
 }
@@ -41,13 +178,13 @@
 .controlBtn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   background: rgba(238, 219, 187, 0.06);
   border: 1px solid rgba(238, 219, 187, 0.14);
   color: var(--color-text-secondary);
   border-radius: var(--radius-full);
-  padding: 6px 12px;
-  font-size: 0.75rem;
+  padding: 5px 10px;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -57,14 +194,13 @@
   background: rgba(238, 219, 187, 0.18);
   border-color: rgba(238, 219, 187, 0.4);
   color: var(--color-gold-sand);
-  transform: translateY(-1px);
 }
 
 .activeBtn {
   background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(238, 219, 187, 0.15) 100%);
   border-color: var(--color-gold-sand);
   color: var(--color-gold-sand);
-  box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.35);
 }
 
 /* 3D Hover Tooltip */
@@ -140,17 +276,17 @@
 /* 3D Universe Stats HUD */
 .universeStats {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 14px;
+  right: 14px;
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(12, 10, 7, 0.8);
+  background: rgba(12, 10, 7, 0.82);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(238, 219, 187, 0.16);
   border-radius: var(--radius-full);
-  padding: 5px 14px;
-  font-size: 0.72rem;
+  padding: 4px 12px;
+  font-size: 0.7rem;
   color: var(--color-text-secondary);
   font-family: var(--font-mono);
   pointer-events: none;
@@ -171,7 +307,67 @@
   color: var(--color-gold-sand);
 }
 
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 0 6px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.statsBadges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(238, 219, 187, 0.06);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+}
+
+.badge strong {
+  color: var(--color-gold-sand);
+}
+
+.anomalyBadge {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.anomalyBadge strong {
+  color: #ef4444;
+}
+
+.helpHint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--color-muted);
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+  .embedded3DCanvas {
+    height: 360px;
+  }
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
