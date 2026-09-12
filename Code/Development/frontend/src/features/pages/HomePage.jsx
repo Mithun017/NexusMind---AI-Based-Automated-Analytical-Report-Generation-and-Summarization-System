@@ -30,7 +30,8 @@ import {
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { uploadFile } from '../../api/upload';
-import { runAnalysis } from '../../api/analysis';
+import { runAnalysis, getAnalysis } from '../../api/analysis';
+import { getGraphData } from '../../api/graph';
 import styles from './HomePage.module.css';
 
 const PRESETS = [
@@ -222,41 +223,52 @@ export default function HomePage() {
     // Step 1: Validate
     setCurrentStep(1);
     setStatusMessage('Step 1/6: Validating chromatography dataset headers & integrity...');
-    await new Promise(r => setTimeout(r, 450));
+    
+    // Start backend analysis call immediately
+    const analysisPromise = runAnalysis(uploadRes.upload_id);
+    
+    await new Promise(r => setTimeout(r, 600));
 
     // Step 2: Preprocess
     setCurrentStep(2);
     setStatusMessage('Step 2/6: Preprocessing chromatographic signals, noise reduction & baseline correction...');
-    await new Promise(r => setTimeout(r, 450));
+    await new Promise(r => setTimeout(r, 600));
 
     // Step 3: Analytics
     setCurrentStep(3);
     setStatusMessage('Step 3/6: Extracting deterministic peak KPIs, retention times & USP resolution...');
-    
-    // Trigger actual analysis backend API call
-    const analysisPromise = runAnalysis(uploadRes.upload_id);
-    
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 600));
 
     // Step 4: ML Anomaly
     setCurrentStep(4);
     setStatusMessage('Step 4/6: Executing Isolation Forest ML anomaly scoring & outlier detection...');
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 600));
 
     // Step 5: Knowledge Graph
     setCurrentStep(5);
     setStatusMessage('Step 5/6: Linking chromatographic entities to Neo4j Analytical Knowledge Graph...');
-    await new Promise(r => setTimeout(r, 500));
 
-    // Step 6: PDF Report
-    setCurrentStep(6);
-    setStatusMessage('Step 6/6: Synthesizing compliance summary & 21 CFR Part 11 PDF report...');
-    
+    // Await analysis completion from backend
     const analysisRes = await analysisPromise;
+
+    // Prefetch full analysis payload and graph data concurrently during final phase
+    const [fullAnalysis, graphData] = await Promise.all([
+      getAnalysis(analysisRes.analysis_id).catch(() => analysisRes),
+      getGraphData(analysisRes.analysis_id).catch(() => null)
+    ]);
+
+    // Step 6: PDF Report & Dashboard Ready
+    setCurrentStep(6);
+    setStatusMessage('Step 6/6: Synthesizing compliance summary & analytical dashboard ready...');
     await new Promise(r => setTimeout(r, 600));
 
-    // Complete & Navigate
-    navigate(`/dashboard/${analysisRes.analysis_id}`);
+    // Complete & Navigate with preloaded state for 0ms instant dashboard presentation
+    navigate(`/dashboard/${analysisRes.analysis_id}`, {
+      state: {
+        initialAnalysis: fullAnalysis,
+        initialGraph: graphData
+      }
+    });
   };
 
   // Unified Joint Execution: Combines File Dataset + Physical Chromatographic Faders

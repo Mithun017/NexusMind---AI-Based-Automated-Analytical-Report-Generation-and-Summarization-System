@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import {
   Loader2,
   Calendar,
@@ -25,12 +25,16 @@ import styles from './DashboardPage.module.css';
 export default function DashboardPage() {
   const { analysisId: paramAnalysisId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [activeAnalysisId, setActiveAnalysisId] = useState(paramAnalysisId || null);
+  const initialAnalysis = location.state?.initialAnalysis;
+  const initialGraph = location.state?.initialGraph;
+
+  const [activeAnalysisId, setActiveAnalysisId] = useState(paramAnalysisId || initialAnalysis?.id || initialAnalysis?.analysis_id || null);
   const [historyList, setHistoryList] = useState([]);
-  const [analysis, setAnalysis] = useState(null);
-  const [graphData, setGraphData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [analysis, setAnalysis] = useState(initialAnalysis || null);
+  const [graphData, setGraphData] = useState(initialGraph || null);
+  const [loading, setLoading] = useState(!initialAnalysis);
   const [error, setError] = useState(null);
 
   // Load available history runs for quick switcher
@@ -40,11 +44,12 @@ export default function DashboardPage() {
         const res = await getHistory(1, 20);
         if (res.items && res.items.length > 0) {
           setHistoryList(res.items);
-          if (!paramAnalysisId) {
-            setActiveAnalysisId(res.items[0]._id);
-            navigate(`/dashboard/${res.items[0]._id}`, { replace: true });
+          if (!paramAnalysisId && !activeAnalysisId) {
+            const firstId = res.items[0].analysis_id || res.items[0].id || res.items[0]._id;
+            setActiveAnalysisId(firstId);
+            navigate(`/dashboard/${firstId}`, { replace: true });
           }
-        } else if (!paramAnalysisId) {
+        } else if (!paramAnalysisId && !initialAnalysis) {
           setLoading(false);
         }
       } catch (err) {
@@ -52,12 +57,18 @@ export default function DashboardPage() {
       }
     };
     fetchRuns();
-  }, [paramAnalysisId]);
+  }, [paramAnalysisId, activeAnalysisId, initialAnalysis, navigate]);
 
-  // When active ID changes, fetch details
+  // When active ID changes, fetch details if not already populated from state
   useEffect(() => {
     if (!paramAnalysisId && !activeAnalysisId) return;
     const targetId = paramAnalysisId || activeAnalysisId;
+
+    // If preloaded analysis matches target ID, use it immediately with zero delay
+    if (analysis && (analysis.id === targetId || analysis.analysis_id === targetId)) {
+      setLoading(false);
+      return;
+    }
 
     const fetchFullAnalysis = async () => {
       try {
