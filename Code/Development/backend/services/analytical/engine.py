@@ -76,21 +76,21 @@ class AnalyticalEngine:
         quality_score = round(float(completeness * resolution_factor * 100.0), 1)
         quality_score = min(100.0, max(0.0, quality_score))
 
-        peak_details: List[PeakDetail] = []
-        for _, row in df.iterrows():
-            peak_details.append(
-                PeakDetail(
-                    peak_id=str(row.get("peak_id", "")),
-                    retention_time=round(float(row.get("retention_time", 0.0)), 3),
-                    peak_area=round(float(row.get("peak_area", 0.0)), 2),
-                    peak_height=round(float(row.get("peak_height", 0.0)), 2),
-                    intensity=round(float(row.get("intensity", 0.0)), 2),
-                    concentration=round(float(row.get("concentration", 0.0)), 4),
-                    compound_name=str(row.get("compound_name", "Unknown")),
-                    relative_abundance=round(float(row.get("relative_abundance", 0.0)), 2),
-                    snr=round(float(row.get("snr", 0.0)), 2),
-                )
+        records = df.to_dict("records")
+        peak_details: List[PeakDetail] = [
+            PeakDetail(
+                peak_id=str(r.get("peak_id", f"PK-{idx+1:03d}")),
+                retention_time=round(float(r.get("retention_time", 0.0)), 3),
+                peak_area=round(float(r.get("peak_area", 0.0)), 2),
+                peak_height=round(float(r.get("peak_height", 0.0)), 2),
+                intensity=round(float(r.get("intensity", 0.0)), 2),
+                concentration=round(float(r.get("concentration", 0.0)), 4),
+                compound_name=str(r.get("compound_name", "Unknown")),
+                relative_abundance=round(float(r.get("relative_abundance", 0.0)), 2),
+                snr=round(float(r.get("snr", 0.0)), 2),
             )
+            for idx, r in enumerate(records)
+        ]
 
         return AnalyticalResult(
             total_peaks=total_peaks,

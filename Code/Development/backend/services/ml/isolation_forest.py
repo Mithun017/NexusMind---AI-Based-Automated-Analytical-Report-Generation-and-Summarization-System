@@ -53,7 +53,8 @@ class IsolationForestDetector(AnomalyDetector):
         labels = self.model.predict(X)
 
         results: List[AnomalyResult] = []
-        for pos, (_, row) in enumerate(df_aligned.iterrows()):
+        records = df_aligned.to_dict("records")
+        for pos, row in enumerate(records):
             score = float(normalized[pos])
             is_anomaly = bool(labels[pos] == -1)
             confidence = round(score * 100.0, 1)
