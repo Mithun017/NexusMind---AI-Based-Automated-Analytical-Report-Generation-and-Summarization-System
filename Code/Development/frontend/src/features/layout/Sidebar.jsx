@@ -9,8 +9,6 @@ import {
   Cpu,
   ShieldCheck,
   BookOpen,
-  Layers,
-  Sparkles
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
@@ -86,26 +84,6 @@ export default function Sidebar({ isOpen, onClose }) {
           </div>
         ))}
       </nav>
-
-      <div className={styles.sidebarFooter}>
-        <div className={styles.aiBadgeCard}>
-          <div className={styles.aiBadgeHeader}>
-            <Sparkles size={14} className={styles.aiSparkleIcon} />
-            <span>Hybrid Analytical Core</span>
-          </div>
-          <p className={styles.aiBadgeDesc}>
-            Deterministic Engine + Isolation Forest + LLaMA 3.3 70B
-          </p>
-        </div>
-
-        <div className={styles.statusFooter}>
-          <div className={styles.statusIndicator}>
-            <div className={styles.statusDot}></div>
-            <span>System Operational</span>
-          </div>
-          <span className={styles.versionTag}>v1.2.0</span>
-        </div>
-      </div>
     </aside>
   );
 }
