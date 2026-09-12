@@ -20,22 +20,25 @@
 }
 
 .menuBtn {
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md);
-  color: var(--color-text);
+  color: var(--color-gold-sand);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   cursor: pointer;
   flex-shrink: 0;
+  transition: all var(--transition-fast);
 }
 
 .menuBtn:hover {
   background: var(--color-surface-hover);
-  border-color: rgba(238, 219, 187, 0.3);
+  border-color: rgba(238, 219, 187, 0.4);
+  color: var(--color-luminous-gold);
+  transform: scale(1.05);
 }
 
 .breadcrumbWrapper {

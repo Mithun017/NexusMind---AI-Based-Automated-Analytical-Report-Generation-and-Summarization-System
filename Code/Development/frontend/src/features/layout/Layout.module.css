@@ -6,18 +6,23 @@
 
 .mainWrapper {
   flex: 1;
-  margin-left: 260px;
+  margin-left: 270px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  transition: margin-left var(--transition-normal);
-  width: calc(100% - 260px);
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: calc(100% - 270px);
+}
+
+.mainWrapperCollapsed {
+  margin-left: 72px;
+  width: calc(100% - 72px);
 }
 
 .content {
   flex: 1;
   padding: var(--space-lg);
-  max-width: 1400px;
+  max-width: 1440px;
   width: 100%;
   margin: 0 auto;
 }
@@ -33,8 +38,8 @@
 
 @media (max-width: 768px) {
   .mainWrapper {
-    margin-left: 0;
-    width: 100%;
+    margin-left: 0 !important;
+    width: 100% !important;
   }
 
   .content {

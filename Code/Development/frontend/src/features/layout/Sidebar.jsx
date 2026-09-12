@@ -12,10 +12,11 @@ import {
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
-export default function Sidebar({ isOpen, onClose }) {
+export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }) {
   const navSections = [
     {
       title: 'Core Studio',
+      shortTitle: 'CORE',
       items: [
         { to: '/', label: 'New Analysis', icon: UploadCloud, end: true, badge: 'Studio' },
         { to: '/dashboard', label: 'Analysis Dashboard', icon: LayoutDashboard },
@@ -24,6 +25,7 @@ export default function Sidebar({ isOpen, onClose }) {
     },
     {
       title: 'Advanced Analytics',
+      shortTitle: 'ADVA',
       items: [
         { to: '/graph', label: 'Knowledge Graph', icon: Share2, badge: 'Neo4j' },
         { to: '/diagnostics', label: 'ML Diagnostics', icon: AlertTriangle, badge: 'iForest' },
@@ -31,6 +33,7 @@ export default function Sidebar({ isOpen, onClose }) {
     },
     {
       title: 'Intelligence & System',
+      shortTitle: 'INTEL',
       items: [
         { to: '/models', label: 'AI Model Hub', icon: Cpu, badge: 'LLM' },
         { to: '/audit', label: 'Audit & Compliance', icon: ShieldCheck, badge: '21 CFR' },
@@ -40,22 +43,34 @@ export default function Sidebar({ isOpen, onClose }) {
   ];
 
   return (
-    <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
-      <div className={styles.brand}>
+    <aside
+      className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''} ${
+        isCollapsed ? styles.sidebarCollapsed : ''
+      }`}
+    >
+      <div
+        className={styles.brand}
+        onClick={onToggleCollapse}
+        role="button"
+        tabIndex={0}
+        title={isCollapsed ? 'Click to Expand Sidebar' : 'Click to Collapse Sidebar'}
+      >
         <div className={styles.logoIcon}>
           <img src="/logo.svg" alt="NexusMind Logo" width="36" height="36" />
         </div>
-        <div className={styles.brandText}>
-          <span className={styles.brandTitle}>NexusMind</span>
-          <span className={styles.brandSubtitle}>ANALYTICAL INTELLIGENCE</span>
-        </div>
+        {!isCollapsed && (
+          <div className={styles.brandText}>
+            <span className={styles.brandTitle}>NexusMind</span>
+            <span className={styles.brandSubtitle}>ANALYTICAL INTELLIGENCE</span>
+          </div>
+        )}
       </div>
 
       <nav className={styles.nav}>
         {navSections.map((section, sIdx) => (
           <div key={sIdx} className={styles.sectionGroup}>
             <div className={styles.sectionHeader}>
-              <span>{section.title}</span>
+              <span>{isCollapsed ? section.shortTitle : section.title}</span>
             </div>
             <div className={styles.sectionItems}>
               {section.items.map((item) => {
@@ -66,15 +81,17 @@ export default function Sidebar({ isOpen, onClose }) {
                     to={item.to}
                     end={item.end}
                     onClick={onClose}
+                    data-tooltip={item.label}
                     className={({ isActive }) =>
                       `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
                     }
+                    title={isCollapsed ? item.label : undefined}
                   >
                     <div className={styles.navItemMain}>
-                      <IconComponent size={18} className={styles.navIcon} />
-                      <span className={styles.navLabel}>{item.label}</span>
+                      <IconComponent size={19} className={styles.navIcon} />
+                      {!isCollapsed && <span className={styles.navLabel}>{item.label}</span>}
                     </div>
-                    {item.badge && (
+                    {!isCollapsed && item.badge && (
                       <span className={styles.navBadge}>{item.badge}</span>
                     )}
                   </NavLink>
