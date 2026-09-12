@@ -59,6 +59,26 @@ const PIPELINE_STEPS = [
   { id: 6, label: 'PDF Report', icon: FileText, desc: '21 CFR Part 11 PDF compilation' },
 ];
 
+// Dynamic multi-stop level gradient helper for all faders
+const getFaderGradient = (percent) => {
+  if (percent > 75) {
+    return {
+      background: 'linear-gradient(90deg, #10b981 0%, #f59e0b 40%, #ef4444 100%)',
+      boxShadow: '0 0 12px rgba(239, 68, 68, 0.7), inset 0 2px 2px rgba(255, 255, 255, 0.4)',
+    };
+  }
+  if (percent > 45) {
+    return {
+      background: 'linear-gradient(90deg, #10b981 0%, #d4af37 45%, #f59e0b 100%)',
+      boxShadow: '0 0 10px rgba(245, 158, 11, 0.65), inset 0 2px 2px rgba(255, 255, 255, 0.4)',
+    };
+  }
+  return {
+    background: 'linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)',
+    boxShadow: '0 0 10px rgba(16, 185, 129, 0.55), inset 0 2px 2px rgba(255, 255, 255, 0.4)',
+  };
+};
+
 export default function HomePage() {
   const navigate = useNavigate();
   const [processing, setProcessing] = useState(false);
@@ -356,7 +376,10 @@ export default function HomePage() {
                 <div className={styles.recessedTrack}>
                   <div
                     className={styles.activeFill}
-                    style={{ width: `${((injVolume - 5) / 95) * 100}%` }}
+                    style={{
+                      width: `${((injVolume - 5) / 95) * 100}%`,
+                      ...getFaderGradient(((injVolume - 5) / 95) * 100),
+                    }}
                   />
                   <input
                     type="range"
@@ -383,7 +406,10 @@ export default function HomePage() {
                 <div className={styles.recessedTrack}>
                   <div
                     className={styles.activeFill}
-                    style={{ width: `${((flowRate - 0.4) / 2.1) * 100}%` }}
+                    style={{
+                      width: `${((flowRate - 0.4) / 2.1) * 100}%`,
+                      ...getFaderGradient(((flowRate - 0.4) / 2.1) * 100),
+                    }}
                   />
                   <input
                     type="range"
@@ -410,7 +436,10 @@ export default function HomePage() {
                 <div className={styles.recessedTrack}>
                   <div
                     className={styles.activeFill}
-                    style={{ width: `${((columnTemp - 20) / 45) * 100}%` }}
+                    style={{
+                      width: `${((columnTemp - 20) / 45) * 100}%`,
+                      ...getFaderGradient(((columnTemp - 20) / 45) * 100),
+                    }}
                   />
                   <input
                     type="range"
@@ -439,7 +468,7 @@ export default function HomePage() {
                     className={styles.activeFill}
                     style={{
                       width: `${(impurityRatio / 20) * 100}%`,
-                      background: impurityRatio > 10 ? 'linear-gradient(90deg, #f59e0b, #ef4444)' : undefined,
+                      ...getFaderGradient((impurityRatio / 20) * 100),
                     }}
                   />
                   <input
@@ -467,7 +496,10 @@ export default function HomePage() {
                 <div className={styles.recessedTrack}>
                   <div
                     className={styles.activeFill}
-                    style={{ width: `${((noiseLevel - 0.001) / 0.039) * 100}%` }}
+                    style={{
+                      width: `${((noiseLevel - 0.001) / 0.039) * 100}%`,
+                      ...getFaderGradient(((noiseLevel - 0.001) / 0.039) * 100),
+                    }}
                   />
                   <input
                     type="range"
@@ -494,7 +526,10 @@ export default function HomePage() {
                 <div className={styles.recessedTrack}>
                   <div
                     className={styles.activeFill}
-                    style={{ width: `${((columnPressure - 50) / 350) * 100}%` }}
+                    style={{
+                      width: `${((columnPressure - 50) / 350) * 100}%`,
+                      ...getFaderGradient(((columnPressure - 50) / 350) * 100),
+                    }}
                   />
                   <input
                     type="range"
@@ -521,7 +556,10 @@ export default function HomePage() {
                 <div className={styles.recessedTrack}>
                   <div
                     className={styles.activeFill}
-                    style={{ width: `${((wavelength - 200) / 200) * 100}%` }}
+                    style={{
+                      width: `${((wavelength - 200) / 200) * 100}%`,
+                      ...getFaderGradient(((wavelength - 200) / 200) * 100),
+                    }}
                   />
                   <input
                     type="range"
