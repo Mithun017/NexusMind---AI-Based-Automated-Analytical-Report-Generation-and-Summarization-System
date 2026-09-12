@@ -28,6 +28,7 @@ import {
   Waves,
   Table as TableIcon
 } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { uploadFile } from '../../api/upload';
 import { runAnalysis } from '../../api/analysis';
 import styles from './HomePage.module.css';
@@ -121,19 +122,46 @@ export default function HomePage() {
     setWavelength(254);
   };
 
-  // Parse CSV file content for real-time in-card preview and parameter binding
+  // Parse CSV / XLSX file content for real-time in-card preview and parameter binding
   const parseFilePreview = (file) => {
     if (!file) return;
+    const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const text = e.target.result;
-        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-        if (lines.length > 0) {
-          const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-          const parsed = lines.slice(1).map(line => {
-            return line.split(',').map(cell => cell.trim().replace(/^"|"$/g, ''));
-          });
+        let headers = [];
+        let parsed = [];
+
+        if (isExcel) {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const jsonSheet = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+
+          if (jsonSheet.length > 0) {
+            headers = (jsonSheet[0] || []).map(h => String(h).trim()).filter(h => h.length > 0);
+            parsed = jsonSheet.slice(1)
+              .filter(r => r.some(c => String(c).trim() !== ''))
+              .map(row => {
+                return headers.map((_, i) => String(row[i] !== undefined && row[i] !== null ? row[i] : '').trim());
+              });
+          }
+        } else {
+          // CSV / Text format
+          const text = typeof e.target.result === 'string' ? e.target.result : new TextDecoder('utf-8').decode(e.target.result);
+          const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+          if (lines.length > 0) {
+            const delimiter = lines[0].includes('\t') ? '\t' : (lines[0].includes(';') ? ';' : ',');
+            headers = lines[0].split(delimiter).map(h => h.trim().replace(/^"|"$/g, ''));
+            parsed = lines.slice(1).map(line => {
+              return line.split(delimiter).map(cell => cell.trim().replace(/^"|"$/g, ''));
+            });
+          }
+        }
+
+        if (headers.length > 0) {
           setRawHeaders(headers);
           setRawRows(parsed);
         }
@@ -141,7 +169,12 @@ export default function HomePage() {
         console.warn('Failed to parse file preview:', err);
       }
     };
-    reader.readAsText(file);
+
+    if (isExcel) {
+      reader.readAsArrayBuffer(file);
+    } else {
+      reader.readAsText(file);
+    }
   };
 
   // Dynamically compute modulated preview rows based on current faders
