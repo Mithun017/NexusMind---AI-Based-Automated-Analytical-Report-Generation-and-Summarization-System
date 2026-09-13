@@ -17,10 +17,13 @@ CONSTRAINTS = [
 
 async def init_graph_schema():
     driver = get_neo4j_driver()
-    async with driver.session() as session:
-        for query in CONSTRAINTS:
-            try:
-                await session.run(query)
-            except Exception as e:
-                logger.warning(f"Error executing schema constraint '{query}': {e}")
-    logger.info("Neo4j schema constraints initialized.")
+    try:
+        async with driver.session() as session:
+            for query in CONSTRAINTS:
+                try:
+                    await session.run(query)
+                except Exception as e:
+                    logger.debug(f"Constraint notice: {e}")
+        logger.info("Neo4j schema constraints initialized.")
+    except Exception as e:
+        logger.debug(f"Neo4j schema constraints init skipped: {e}")

@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import get_settings
 from core.exceptions import register_exception_handlers
 from db.mongodb import init_mongodb, close_mongodb
-from db.neo4j_client import init_neo4j, close_neo4j
+from db.neo4j_client import init_neo4j, close_neo4j, ping_neo4j
 from services.graph.schema import init_graph_schema
 from services.llm.groq_provider import GroqProvider
 from services.llm.openrouter_provider import OpenRouterProvider
@@ -54,9 +54,12 @@ async def lifespan(app: FastAPI):
 
     try:
         await init_neo4j(settings)
-        await init_graph_schema()
+        if await ping_neo4j():
+            await init_graph_schema()
+        else:
+            logger.info("Neo4j database is currently offline on bolt://localhost:7687. System running with resilient analytical graph fallback.")
     except Exception as e:
-        logger.warning(f"Failed to initialize Neo4j: {e}")
+        logger.info(f"Neo4j offline: {e}. System running with resilient analytical graph fallback.")
 
     # 3. Model catalog validation at startup (non-fatal warning)
     if settings.groq_api_key:

@@ -14,7 +14,7 @@ async def init_neo4j(settings: Settings):
     _driver = AsyncGraphDatabase.driver(
         settings.neo4j_uri,
         auth=(settings.neo4j_user, settings.neo4j_password),
-        connection_timeout=5.0,
+        connection_timeout=0.5,
         max_connection_lifetime=60,
         max_connection_pool_size=50,
     )
@@ -42,6 +42,5 @@ async def ping_neo4j() -> bool:
             result = await session.run("RETURN 1 AS num")
             record = await result.single()
             return record is not None and record["num"] == 1
-    except Exception as e:
-        logger.error(f"Neo4j ping failed: {e}")
+    except Exception:
         return False

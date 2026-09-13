@@ -1,6 +1,6 @@
 import logging
 from typing import Dict, Any, List
-from db.neo4j_client import get_neo4j_driver
+from db.neo4j_client import get_neo4j_driver, ping_neo4j
 
 logger = logging.getLogger("nexusmind.graph.queries")
 
@@ -9,7 +9,6 @@ async def get_analysis_context(analysis_id: str) -> Dict[str, Any]:
     """
     Retrieves structured knowledge-graph context for an analysis to feed the LLM prompt.
     """
-    driver = get_neo4j_driver()
     context: Dict[str, Any] = {
         "sample": None,
         "instrument": None,
@@ -20,6 +19,11 @@ async def get_analysis_context(analysis_id: str) -> Dict[str, Any]:
         "anomalies": [],
         "prior_interpretations": [],
     }
+
+    if not await ping_neo4j():
+        return context
+
+    driver = get_neo4j_driver()
 
     async with driver.session() as session:
         # Sample, Instrument, AnalysisType
@@ -123,6 +127,9 @@ async def get_graph_nodes_and_edges(analysis_id: str) -> Dict[str, List[Dict[str
     """
     Returns nodes and edges formatted for interactive graph visualization.
     """
+    if not await ping_neo4j():
+        return {"nodes": [], "edges": []}
+
     driver = get_neo4j_driver()
     nodes = []
     edges = []
