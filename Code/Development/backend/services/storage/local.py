@@ -47,14 +47,21 @@ class LocalStorageBackend(StorageBackend):
         try:
             target_path = Path(path)
             if not target_path.exists():
-                if not target_path.is_absolute():
-                    target_path = self.base_dir / path
-                if not target_path.exists():
-                    candidate = self.base_dir / Path(path).name
-                    if candidate.exists():
-                        target_path = candidate
-                    else:
-                        raise StorageError(f"File not found at path '{path}'")
+                candidates = [
+                    self.base_dir / path,
+                    self.base_dir / Path(path).name,
+                    Path(__file__).resolve().parents[2] / "uploads" / Path(path).name,
+                    Path(__file__).resolve().parents[3] / "uploads" / Path(path).name,
+                    Path(os.getcwd()) / "uploads" / Path(path).name,
+                ]
+                found = False
+                for c in candidates:
+                    if c.exists():
+                        target_path = c
+                        found = True
+                        break
+                if not found:
+                    raise StorageError(f"File not found at path '{path}'")
             
             fs_path = _to_fs_path(target_path)
             with open(fs_path, "rb") as f:

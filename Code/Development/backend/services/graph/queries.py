@@ -45,7 +45,7 @@ async def get_analysis_context(analysis_id: str) -> Dict[str, Any]:
             types = sample_row["analysis_types"]
             context["analysis_type"] = types[0] if types else "Chromatography"
 
-        # Compounds and Peaks
+        # Compounds and Peaks (bounded for fast context retrieval)
         peak_res = await session.run(
             """
             MATCH (s:Sample {mongo_id: $analysis_id})-[:CONTAINS]->(c:Compound)-[:PRODUCES]->(p:Peak)
@@ -66,6 +66,7 @@ async def get_analysis_context(analysis_id: str) -> Dict[str, Any]:
                    an.classification AS anomaly_classification,
                    f.description AS finding_desc,
                    f.severity AS finding_severity
+            LIMIT 100
             """,
             analysis_id=str(analysis_id),
         )
@@ -172,6 +173,7 @@ async def get_graph_nodes_and_edges(analysis_id: str) -> Dict[str, List[Dict[str
                    f.description AS fdesc,
                    an.anomaly_id AS anid,
                    an.classification AS an_class
+            LIMIT 150
             """,
             analysis_id=str(analysis_id),
         )

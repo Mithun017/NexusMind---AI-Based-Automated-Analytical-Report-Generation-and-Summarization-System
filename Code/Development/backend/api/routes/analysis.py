@@ -77,7 +77,7 @@ async def run_analysis(
         "max_area": analytical_res.max_area,
         "avg_intensity": analytical_res.avg_intensity,
         "total_area": analytical_res.total_area,
-        "anomalies_count": len([a for a in anomaly_res if a.is_anomaly]),
+        "anomalies_count": len([a for a in anomaly_res if (a.is_anomaly if hasattr(a, 'is_anomaly') else a.get('is_anomaly', False))]),
         "analysis_type": prep_meta["analysis_type"],
     }
 

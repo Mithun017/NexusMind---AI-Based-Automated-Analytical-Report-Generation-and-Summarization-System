@@ -23,8 +23,8 @@ class Settings(BaseSettings):
     llm_provider: str = "groq"
 
     # Storage
-    uploads_dir: str = "./uploads"
-    reports_dir: str = "./reports"
+    uploads_dir: str = str((Path(__file__).resolve().parent / "uploads").resolve())
+    reports_dir: str = str((Path(__file__).resolve().parent / "reports").resolve())
     upload_max_size_mb: int = 50
 
     # ML hyperparameters

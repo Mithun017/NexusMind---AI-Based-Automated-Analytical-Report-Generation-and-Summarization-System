@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Dict, Any
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import IsolationForest
@@ -33,7 +33,7 @@ class IsolationForestDetector(AnomalyDetector):
         X = df[self.FEATURES].fillna(0)
         self.model.fit(X)
 
-    def predict(self, df: pd.DataFrame) -> List[AnomalyResult]:
+    def predict(self, df: pd.DataFrame) -> List[Dict[str, Any]]:
         if df.empty:
             return []
 

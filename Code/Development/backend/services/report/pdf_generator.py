@@ -209,7 +209,10 @@ class PDFReportGenerator:
 
         anom_header = ["Peak ID", "Retention Time", "Score", "Confidence", "Classification"]
         anom_rows = [anom_header]
-        for a in anomalies:
+        # Include top 25 anomalies for clean PDF pagination
+        flagged_anoms = [a for a in anomalies if (a.get('is_anomaly') if isinstance(a, dict) else getattr(a, 'is_anomaly', False))]
+        table_anoms = flagged_anoms[:25] if flagged_anoms else anomalies[:25]
+        for a in table_anoms:
             anom_rows.append([
                 a.get("peak_id", ""),
                 f"{a.get('retention_time', 0.0):.2f} min",
