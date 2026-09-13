@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
+import FloatingChatWidget from '../chat/FloatingChatWidget';
 import styles from './Layout.module.css';
 
 export default function Layout({ children, pageTitle }) {
@@ -57,6 +58,9 @@ export default function Layout({ children, pageTitle }) {
         <Navbar onToggleSidebar={handleToggleSidebar} title={pageTitle} />
         <main className={styles.content}>{children}</main>
       </div>
+
+      {/* Persistent Floating AI Chat Widget */}
+      <FloatingChatWidget />
     </div>
   );
 }
