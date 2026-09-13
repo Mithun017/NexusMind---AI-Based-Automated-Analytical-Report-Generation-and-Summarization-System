@@ -52,7 +52,7 @@ export default function GraphPage() {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
-  const [layoutMode, setLayoutMode] = useState('force'); // 'force', 'sphere', 'helix', 'layered'
+  const [layoutMode, setLayoutMode] = useState('tree'); // 'tree', 'force', 'sphere', 'helix'
   const [selectedNode, setSelectedNode] = useState(null);
 
   // Fetch recent analysis runs for selector
@@ -222,10 +222,10 @@ export default function GraphPage() {
             <span className={styles.selectorLabel}>3D Layout:</span>
             <div className={styles.layoutPills}>
               {[
+                { id: 'tree', label: '3D Tree' },
                 { id: 'force', label: 'Force 3D' },
                 { id: 'sphere', label: 'Orbital Sphere' },
                 { id: 'helix', label: 'Helical DNA' },
-                { id: 'layered', label: 'Layered' },
               ].map((m) => (
                 <button
                   key={m.id}

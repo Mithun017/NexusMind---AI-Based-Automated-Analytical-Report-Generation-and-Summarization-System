@@ -15,7 +15,7 @@ import ThreeKnowledgeGraph from './ThreeKnowledgeGraph';
 import styles from './GraphVisualization.module.css';
 
 export default function GraphVisualization({ graphData = null, analysisId = '', sampleId = '', peaks = [], anomalies = [] }) {
-  const [layoutMode, setLayoutMode] = useState('force');
+  const [layoutMode, setLayoutMode] = useState('tree');
   const [selectedNode, setSelectedNode] = useState(null);
 
   // Normalize nodes and edges from Neo4j or construct rich ontology fallback
@@ -104,10 +104,10 @@ export default function GraphVisualization({ graphData = null, analysisId = '', 
           {/* 3D Layout Switcher */}
           <div className={styles.layoutPills}>
             {[
+              { id: 'tree', label: '3D Tree' },
               { id: 'force', label: 'Force 3D' },
               { id: 'sphere', label: 'Orbital Sphere' },
               { id: 'helix', label: 'Helical DNA' },
-              { id: 'layered', label: 'Layered' },
             ].map((m) => (
               <button
                 key={m.id}
