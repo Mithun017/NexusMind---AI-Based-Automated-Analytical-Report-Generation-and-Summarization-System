@@ -70,8 +70,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(12, 10, 7, 0.7);
-  border: 1px solid rgba(238, 219, 187, 0.18);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 5px 10px;
 }
@@ -91,8 +91,8 @@
 }
 
 .select option {
-  background: #120f0a;
-  color: #fff;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 /* 3D Layout Mode Switcher */
@@ -110,8 +110,8 @@
 
 .layoutPills {
   display: flex;
-  background: rgba(12, 10, 7, 0.7);
-  border: 1px solid rgba(238, 219, 187, 0.14);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   padding: 2px;
   gap: 2px;
@@ -134,9 +134,9 @@
 }
 
 .activeLayoutBtn {
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.35) 0%, rgba(238, 219, 187, 0.18) 100%);
+  background: var(--color-accent-light);
   color: var(--color-gold-sand);
-  border: 1px solid rgba(238, 219, 187, 0.35);
+  border: 1px solid var(--color-border-focus);
   box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
 }
 
@@ -157,8 +157,8 @@
 }
 
 .chip {
-  background: rgba(18, 15, 10, 0.65);
-  border: 1px solid rgba(238, 219, 187, 0.12);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   padding: 4px 12px;
   font-size: 0.72rem;
@@ -169,13 +169,13 @@
 }
 
 .chip:hover {
-  border-color: rgba(238, 219, 187, 0.3);
+  border-color: var(--color-accent);
   color: var(--color-gold-sand);
-  background: rgba(238, 219, 187, 0.08);
+  background: var(--color-surface-hover);
 }
 
 .activeChip {
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(238, 219, 187, 0.15) 100%);
+  background: var(--color-accent-light);
   border-color: var(--color-gold-sand);
   color: var(--color-gold-sand);
   box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
@@ -185,8 +185,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(18, 15, 10, 0.75);
-  border: 1px solid rgba(238, 219, 187, 0.16);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   padding: 5px 14px;
   min-width: 240px;
@@ -238,12 +238,13 @@
   gap: 12px;
   width: 100%;
   height: 100%;
-  background: rgba(8, 7, 5, 0.9);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
   color: var(--color-gold-sand);
   font-size: 0.88rem;
   font-weight: 600;
   border-radius: var(--radius-xl);
-  border: 1px solid rgba(238, 219, 187, 0.15);
+  border: 1px solid var(--color-border);
 }
 
 .spinIcon {
@@ -268,7 +269,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(238, 219, 187, 0.12);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 10px;
   margin-bottom: 12px;
 }
@@ -304,8 +305,8 @@
 }
 
 .nodeMainInfo {
-  background: rgba(12, 10, 7, 0.55);
-  border: 1px solid rgba(238, 219, 187, 0.14);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 12px;
 }
@@ -347,8 +348,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(12, 10, 7, 0.45);
-  border: 1px solid rgba(238, 219, 187, 0.08);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 6px 10px;
   font-size: 0.72rem;
@@ -383,8 +384,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(12, 10, 7, 0.4);
-  border: 1px solid rgba(238, 219, 187, 0.08);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 6px 10px;
   cursor: pointer;
@@ -392,8 +393,8 @@
 }
 
 .neighborItem:hover {
-  background: rgba(238, 219, 187, 0.08);
-  border-color: rgba(238, 219, 187, 0.25);
+  background: var(--color-surface-hover);
+  border-color: var(--color-accent);
   transform: translateX(2px);
 }
 
@@ -426,8 +427,8 @@
 
 /* Stats Card */
 .statsCard {
-  background: rgba(12, 10, 7, 0.6);
-  border: 1px solid rgba(238, 219, 187, 0.14);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 10px 12px;
   display: flex;

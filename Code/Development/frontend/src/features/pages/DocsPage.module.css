@@ -73,7 +73,7 @@
 .tabBtnActive {
   background: var(--color-accent-light);
   color: var(--color-accent-2);
-  border-color: rgba(99, 102, 241, 0.35);
+  border-color: var(--color-accent);
   font-weight: 600;
 }
 
@@ -160,17 +160,18 @@
   font-weight: 600;
   padding: 2px 6px;
   border-radius: var(--radius-sm);
-  background: rgba(6, 182, 212, 0.15);
-  color: #22d3ee;
+  background: var(--color-accent-light);
+  color: var(--color-gold-sand);
 }
 
 .equation {
   font-family: var(--font-mono);
   font-size: 0.9rem;
   padding: 10px;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  color: #a5b4fc;
+  color: var(--color-gold-sand);
   text-align: center;
 }
 
@@ -275,7 +276,8 @@
 }
 
 .endpointSelect option, .methodSelect option {
-  background: #0f172a;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .sendApiBtn {
@@ -283,7 +285,7 @@
   align-items: center;
   gap: 6px;
   background: var(--color-accent);
-  color: white;
+  color: var(--color-bg);
   border: none;
   border-radius: var(--radius-md);
   padding: 8px 16px;
@@ -298,16 +300,16 @@
 }
 
 .responseConsole {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
 
 .consoleBar {
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--color-surface-hover);
+  border-bottom: 1px solid var(--color-border);
   font-size: 0.75rem;
   color: var(--color-muted);
   display: flex;
@@ -332,7 +334,7 @@
   margin: 0;
   font-family: var(--font-mono);
   font-size: 0.8rem;
-  color: #38bdf8;
+  color: var(--color-gold-sand);
   max-height: 280px;
   overflow-y: auto;
   white-space: pre-wrap;

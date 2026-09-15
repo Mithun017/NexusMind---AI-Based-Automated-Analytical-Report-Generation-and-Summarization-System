@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import Plotly from 'plotly.js-dist-min';
 import { Activity, Sparkles, Filter, Layers, ZoomIn, Info } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 import styles from './Chromatogram.module.css';
 
 export default function Chromatogram({ peaks = [], anomalies = [] }) {
+  const { theme } = useTheme();
   const plotRef = useRef(null);
   const [filterMode, setFilterMode] = useState('all'); // 'all', 'anomalies', 'major'
   const [showTopLabels, setShowTopLabels] = useState(true);
+
+  const isLight = theme === 'light';
 
   const anomalyMap = useMemo(() => {
     const map = new Map();
@@ -53,7 +57,7 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
         y: normalPeaks.map((p) => p.intensity),
         text: normalPeaks.map(
           (p) =>
-            `<b style="color:#d4af37;">${p.peak_id}</b>: <b>${p.compound_name || 'Standard Compound'}</b><br>` +
+            `<b style="color:${isLight ? '#8c6d3b' : '#d4af37'};">${p.peak_id}</b>: <b>${p.compound_name || 'Standard Compound'}</b><br>` +
             `Retention Time: <b>${Number(p.retention_time).toFixed(2)} min</b><br>` +
             `Peak Intensity: <b>${Number(p.intensity).toLocaleString()} mAU</b><br>` +
             `Integrated Area: <b>${Number(p.peak_area || 0).toLocaleString()}</b>`
@@ -63,11 +67,11 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
         type: 'scatter',
         name: 'Standard Peak',
         marker: {
-          color: '#eedbbb',
+          color: isLight ? '#b38e44' : '#eedbbb',
           size: displayedPeaks.length > 300 ? 6 : 8,
           symbol: 'diamond',
           opacity: 0.85,
-          line: { color: '#c5a059', width: 1.2 },
+          line: { color: isLight ? '#8c6d3b' : '#c5a059', width: 1.2 },
         },
       });
     }
@@ -115,16 +119,18 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
           arrowhead: 2,
           arrowsize: 1,
           arrowwidth: 1.2,
-          arrowcolor: isAnom ? '#ef4444' : '#d4af37',
+          arrowcolor: isAnom ? '#ef4444' : (isLight ? '#b38e44' : '#d4af37'),
           ax: 0,
           ay: -32,
           font: {
             family: 'Inter, sans-serif',
             size: 10,
-            color: isAnom ? '#fca5a5' : '#f3ebdc',
+            color: isAnom ? (isLight ? '#991b1b' : '#fca5a5') : (isLight ? '#1f1811' : '#f3ebdc'),
           },
-          bgcolor: isAnom ? 'rgba(127, 29, 29, 0.85)' : 'rgba(28, 24, 17, 0.85)',
-          bordercolor: isAnom ? '#ef4444' : '#d4af37',
+          bgcolor: isAnom
+            ? (isLight ? 'rgba(254, 226, 226, 0.95)' : 'rgba(127, 29, 29, 0.85)')
+            : (isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(28, 24, 17, 0.85)'),
+          bordercolor: isAnom ? '#ef4444' : (isLight ? '#b38e44' : '#d4af37'),
           borderwidth: 1,
           borderpad: 4,
           opacity: 0.95,
@@ -132,7 +138,7 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
       });
     }
 
-    // 4. Subtle baseline stem lines (rendered selectively if < 250 peaks, or only for top/anomalies for high density)
+    // 4. Subtle baseline stem lines
     const shapes = [];
     const stemTargetPeaks =
       displayedPeaks.length <= 200
@@ -148,7 +154,9 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
         x1: p.retention_time,
         y1: p.intensity,
         line: {
-          color: isAnom ? 'rgba(239, 68, 68, 0.45)' : 'rgba(238, 219, 187, 0.2)',
+          color: isAnom
+            ? 'rgba(239, 68, 68, 0.45)'
+            : (isLight ? 'rgba(180, 142, 68, 0.3)' : 'rgba(238, 219, 187, 0.2)'),
           width: isAnom ? 1.5 : 1,
           dash: 'dot',
         },
@@ -157,7 +165,7 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
 
     const layout = {
       paper_bgcolor: 'transparent',
-      plot_bgcolor: 'rgba(15, 12, 8, 0.65)',
+      plot_bgcolor: isLight ? 'rgba(255, 255, 255, 0.7)' : 'rgba(15, 12, 8, 0.65)',
       margin: { t: 30, r: 25, b: 50, l: 60 },
       showlegend: false,
       annotations,
@@ -166,25 +174,25 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
       xaxis: {
         title: {
           text: 'Retention Time (min)',
-          font: { family: 'Inter, sans-serif', size: 11, color: '#c9bda8' },
+          font: { family: 'Inter, sans-serif', size: 11, color: isLight ? '#6b5e4c' : '#c9bda8' },
         },
-        gridcolor: 'rgba(238, 219, 187, 0.07)',
-        zerolinecolor: 'rgba(238, 219, 187, 0.18)',
-        tickfont: { family: 'JetBrains Mono, monospace', size: 10, color: '#c9bda8' },
+        gridcolor: isLight ? 'rgba(180, 142, 68, 0.12)' : 'rgba(238, 219, 187, 0.07)',
+        zerolinecolor: isLight ? 'rgba(180, 142, 68, 0.25)' : 'rgba(238, 219, 187, 0.18)',
+        tickfont: { family: 'JetBrains Mono, monospace', size: 10, color: isLight ? '#6b5e4c' : '#c9bda8' },
       },
       yaxis: {
         title: {
           text: 'Intensity (mAU)',
-          font: { family: 'Inter, sans-serif', size: 11, color: '#c9bda8' },
+          font: { family: 'Inter, sans-serif', size: 11, color: isLight ? '#6b5e4c' : '#c9bda8' },
         },
-        gridcolor: 'rgba(238, 219, 187, 0.07)',
-        zerolinecolor: 'rgba(238, 219, 187, 0.18)',
-        tickfont: { family: 'JetBrains Mono, monospace', size: 10, color: '#c9bda8' },
+        gridcolor: isLight ? 'rgba(180, 142, 68, 0.12)' : 'rgba(238, 219, 187, 0.07)',
+        zerolinecolor: isLight ? 'rgba(180, 142, 68, 0.25)' : 'rgba(238, 219, 187, 0.18)',
+        tickfont: { family: 'JetBrains Mono, monospace', size: 10, color: isLight ? '#6b5e4c' : '#c9bda8' },
       },
       hoverlabel: {
-        bgcolor: 'rgba(18, 14, 10, 0.95)',
-        bordercolor: '#d4af37',
-        font: { family: 'Inter, sans-serif', size: 11, color: '#fcfaf1' },
+        bgcolor: isLight ? 'rgba(255, 255, 255, 0.96)' : 'rgba(18, 14, 10, 0.95)',
+        bordercolor: isLight ? '#b38e44' : '#d4af37',
+        font: { family: 'Inter, sans-serif', size: 11, color: isLight ? '#1f1811' : '#fcfaf1' },
         align: 'left',
       },
     };
@@ -211,7 +219,7 @@ export default function Chromatogram({ peaks = [], anomalies = [] }) {
         Plotly.purge(plotRef.current);
       }
     };
-  }, [displayedPeaks, anomalyMap, topPeakIds, showTopLabels]);
+  }, [displayedPeaks, anomalyMap, topPeakIds, showTopLabels, isLight]);
 
   const anomalyCount = useMemo(
     () => peaks.filter((p) => anomalyMap.has(p.peak_id)).length,

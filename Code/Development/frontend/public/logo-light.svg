@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="goldGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4AF37" />
+      <stop offset="50%" stop-color="#B8860B" />
+      <stop offset="100%" stop-color="#8C6D3B" />
+    </linearGradient>
+    <linearGradient id="goldGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EEDBBB" />
+      <stop offset="50%" stop-color="#C5A059" />
+      <stop offset="100%" stop-color="#8C6D3B" />
+    </linearGradient>
+    <linearGradient id="lightBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#F4EFE6" />
+    </linearGradient>
+    <filter id="goldGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Rounded Shield -->
+  <rect x="5" y="5" width="90" height="90" rx="24" fill="url(#lightBg)" stroke="url(#goldGrad1)" stroke-width="2.5" />
+  
+  <!-- Outer Orbital Lattice -->
+  <polygon points="50,18 78,34 78,66 50,82 22,66 22,34" fill="none" stroke="url(#goldGrad2)" stroke-width="1.8" stroke-dasharray="3 3" opacity="0.85" />
+
+  <!-- Nexus Intelligence Neural / Analytical Peak Wave (N-M Monogram) -->
+  <path d="M26 66 L38 32 L50 54 L62 32 L74 66" stroke="url(#goldGrad1)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Core Nexus Convergence Node -->
+  <circle cx="50" cy="54" r="5" fill="url(#goldGrad1)" filter="url(#goldGlow)" />
+  <circle cx="50" cy="54" r="2.5" fill="#FFFFFF" />
+
+  <!-- Apex Measurement Nodes -->
+  <circle cx="38" cy="32" r="3.5" fill="#8C6D3B" />
+  <circle cx="62" cy="32" r="3.5" fill="#8C6D3B" />
+
+  <!-- Grounding Nodes -->
+  <circle cx="26" cy="66" r="3" fill="url(#goldGrad2)" />
+  <circle cx="74" cy="66" r="3" fill="url(#goldGrad2)" />
+  
+  <!-- Luminous Intelligence Apex Sparkle -->
+  <polygon points="50,22 52.5,27 57,28.5 52.5,30 50,35 47.5,30 43,28.5 47.5,27" fill="#B8860B" />
+</svg>

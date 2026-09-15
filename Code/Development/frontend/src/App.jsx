@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
 import Layout from './features/layout/Layout';
 import HomePage from './features/pages/HomePage';
 import DashboardPage from './features/pages/DashboardPage';
@@ -11,7 +12,8 @@ import ReportPage from './features/pages/ReportPage';
 
 export default function App() {
   return (
-    <Layout>
+    <ThemeProvider>
+      <Layout>
       <Routes>
         {/* Core Studio */}
         <Route path="/" element={<HomePage />} />
@@ -32,5 +34,6 @@ export default function App() {
         <Route path="/report/:reportId" element={<ReportPage />} />
       </Routes>
     </Layout>
-  );
+  </ThemeProvider>
+);
 }

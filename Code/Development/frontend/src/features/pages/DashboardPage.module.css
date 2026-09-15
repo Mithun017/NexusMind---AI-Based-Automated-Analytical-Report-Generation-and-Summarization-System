@@ -53,8 +53,8 @@
 }
 
 .runDropdown option {
-  background: #0f172a;
-  color: #fff;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .metaTags {
@@ -103,7 +103,7 @@
 .deepDiveLink:hover {
   background: var(--color-surface-hover);
   color: var(--color-accent-2);
-  border-color: rgba(6, 182, 212, 0.4);
+  border-color: var(--color-accent);
 }
 
 .dateBadge {
@@ -174,7 +174,7 @@
   align-items: center;
   gap: 8px;
   background: var(--color-accent);
-  color: white;
+  color: var(--color-bg);
   padding: 10px 20px;
   border-radius: var(--radius-md);
   font-weight: 600;

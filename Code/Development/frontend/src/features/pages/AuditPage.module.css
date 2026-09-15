@@ -83,7 +83,7 @@
 
 .exportBtn:hover {
   background: var(--color-surface-hover);
-  border-color: rgba(99, 102, 241, 0.4);
+  border-color: var(--color-accent);
 }
 
 .statsRow {
@@ -175,7 +175,8 @@
 }
 
 .filterSelect option {
-  background: #0f172a;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .tableWrapper {
@@ -200,7 +201,7 @@
 
 .table td {
   padding: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--color-border);
   color: var(--color-text-secondary);
   vertical-align: middle;
 }
@@ -216,8 +217,8 @@
   font-weight: 600;
   padding: 3px 6px;
   border-radius: var(--radius-sm);
-  background: rgba(99, 102, 241, 0.15);
-  color: #a5b4fc;
+  background: var(--color-accent-light);
+  color: var(--color-gold-sand);
 }
 
 .operatorCell {
@@ -246,26 +247,26 @@
 }
 
 .badgeSuccess {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
+  background: var(--color-success-bg);
+  color: var(--color-success);
 }
 
 .badgeWarning {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .badgeInfo {
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
+  background: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 .hashBtn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 3px 6px;
   color: var(--color-subtle);
@@ -278,7 +279,7 @@
 
 .hashBtn:hover {
   color: var(--color-text);
-  border-color: rgba(99, 102, 241, 0.4);
+  border-color: var(--color-accent);
 }
 
 .copiedTooltip {
@@ -287,7 +288,7 @@
   left: 50%;
   transform: translateX(-50%);
   background: var(--color-accent);
-  color: white;
+  color: var(--color-bg);
   padding: 2px 6px;
   border-radius: var(--radius-sm);
   font-size: 0.65rem;

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Menu, Database, Server, Plus, BookOpen, Activity } from 'lucide-react';
+import { Menu, Database, Server, Plus, Sun, Moon, Activity } from 'lucide-react';
 import { checkHealth } from '../../api/upload';
+import { useTheme } from '../../context/ThemeContext';
 import styles from './Navbar.module.css';
 
 const ROUTE_MAP = {
@@ -15,6 +16,7 @@ const ROUTE_MAP = {
 
 export default function Navbar({ onToggleSidebar }) {
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
   const [health, setHealth] = useState({ mongo: 'unknown', neo4j: 'unknown' });
 
   // Compute dynamic title & section based on pathname
@@ -74,9 +76,25 @@ export default function Navbar({ onToggleSidebar }) {
             <Plus size={14} />
             <span>New Analysis</span>
           </Link>
-          <Link to="/docs" className={styles.quickBtnIcon} title="Pipeline Documentation">
-            <BookOpen size={16} />
-          </Link>
+
+          {/* Luxury Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className={styles.themeToggleBtn}
+            title={theme === 'dark' ? 'Switch to Light Theme (Ivory & Gold)' : 'Switch to Dark Theme (Obsidian & Gold)'}
+            aria-label="Toggle theme"
+          >
+            <div className={styles.themeIconWrapper}>
+              {theme === 'dark' ? (
+                <Sun size={17} className={styles.sunIcon} />
+              ) : (
+                <Moon size={17} className={styles.moonIcon} />
+              )}
+            </div>
+            <span className={styles.themeLabel}>
+              {theme === 'dark' ? 'Light' : 'Dark'}
+            </span>
+          </button>
         </div>
 
         <div className={styles.healthGroup}>

@@ -199,9 +199,9 @@
   width: 100%;
   height: 18px;
   border-radius: var(--radius-full);
-  background: #120f0a;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9), inset 0 -1px 2px rgba(238, 219, 187, 0.1);
-  border: 1px solid rgba(238, 219, 187, 0.16);
+  background: var(--color-surface);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), inset 0 -1px 2px rgba(238, 219, 187, 0.1);
+  border: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -340,8 +340,8 @@
   flex-direction: column;
   gap: 8px;
   padding: 10px 12px;
-  background: rgba(12, 10, 7, 0.55);
-  border: 1px solid rgba(238, 219, 187, 0.2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   flex: 1;
   min-height: 0;
@@ -355,7 +355,7 @@
   align-items: center;
   gap: 10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(238, 219, 187, 0.12);
+  border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
 }
 
@@ -363,7 +363,7 @@
   width: 28px;
   height: 28px;
   border-radius: var(--radius-sm);
-  background: rgba(238, 219, 187, 0.12);
+  background: var(--color-accent-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -403,8 +403,8 @@
   flex: 1;
   min-height: 0;
   width: 100%;
-  background: rgba(8, 7, 5, 0.85);
-  border: 1px solid rgba(238, 219, 187, 0.14);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   overflow: hidden;
   display: flex;
@@ -419,7 +419,7 @@
   min-height: 0;
   max-height: 100%;
   scrollbar-width: thin;
-  scrollbar-color: rgba(238, 219, 187, 0.25) transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 .tableScroll::-webkit-scrollbar {
@@ -428,12 +428,8 @@
 }
 
 .tableScroll::-webkit-scrollbar-thumb {
-  background: rgba(238, 219, 187, 0.25);
+  background: var(--scrollbar-thumb);
   border-radius: var(--radius-full);
-}
-
-.tableScroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(238, 219, 187, 0.45);
 }
 
 .previewTable {
@@ -447,27 +443,27 @@
 .previewTable thead th {
   position: sticky;
   top: 0;
-  background: #1a160f;
+  background: var(--color-bg-alt);
   color: var(--color-gold-sand);
   font-weight: 600;
   padding: 6px 10px;
-  border-bottom: 1px solid rgba(238, 219, 187, 0.25);
+  border-bottom: 1px solid var(--color-border);
   font-family: var(--font-mono);
   letter-spacing: 0.02em;
   z-index: 2;
 }
 
 .previewTable tbody tr {
-  border-bottom: 1px solid rgba(238, 219, 187, 0.06);
+  border-bottom: 1px solid var(--color-border);
   transition: background var(--transition-fast);
 }
 
 .previewTable tbody tr:nth-child(even) {
-  background: rgba(238, 219, 187, 0.02);
+  background: var(--color-surface-hover);
 }
 
 .previewTable tbody tr:hover {
-  background: rgba(238, 219, 187, 0.08);
+  background: var(--color-surface-active);
 }
 
 .previewTable tbody td {
@@ -480,8 +476,8 @@
   padding: 3px 8px;
   font-size: 0.64rem;
   color: var(--color-gold-sand);
-  background: rgba(238, 219, 187, 0.08);
-  border-top: 1px solid rgba(238, 219, 187, 0.15);
+  background: var(--color-accent-light);
+  border-top: 1px solid var(--color-border);
   text-align: center;
   font-family: var(--font-mono);
   flex-shrink: 0;
@@ -508,11 +504,11 @@
   flex-wrap: wrap;
   gap: var(--space-sm);
   padding: 10px 16px;
-  background: rgba(18, 15, 10, 0.7);
+  background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
-  border: 1px solid rgba(238, 219, 187, 0.2);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
 .modeSummaryBadge {
@@ -551,7 +547,7 @@
 .resetBtn:hover:not(:disabled) {
   background: var(--color-surface-hover);
   color: var(--color-text);
-  border-color: rgba(238, 219, 187, 0.3);
+  border-color: var(--color-accent);
 }
 
 .masterExecBtn {
@@ -562,17 +558,17 @@
   padding: 9px 24px;
   border-radius: var(--radius-md);
   background: var(--color-gradient-primary);
-  color: #0c0a07;
+  color: var(--color-bg);
   font-weight: 700;
   font-size: 0.86rem;
   cursor: pointer;
   border: none;
-  box-shadow: 0 0 16px rgba(212, 175, 55, 0.35);
+  box-shadow: var(--shadow-gold);
   transition: all var(--transition-fast);
 }
 
 .masterExecBtn:hover:not(:disabled) {
-  box-shadow: 0 0 24px rgba(212, 175, 55, 0.6);
+  box-shadow: var(--shadow-glow);
   transform: translateY(-1px);
 }
 
@@ -629,10 +625,10 @@
   font-size: 0.7rem;
   font-family: var(--font-mono);
   color: var(--color-subtle);
-  background: rgba(238, 219, 187, 0.08);
+  background: var(--color-accent-light);
   padding: 2px 8px;
   border-radius: var(--radius-full);
-  border: 1px solid rgba(238, 219, 187, 0.15);
+  border: 1px solid var(--color-border);
 }
 
 /* Steps Track */
@@ -674,7 +670,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(238, 219, 187, 0.12);
+  background: var(--color-border);
 }
 
 .connectingLineActive {
@@ -708,8 +704,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #14110c;
-  border: 1px solid rgba(238, 219, 187, 0.2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   color: var(--color-subtle);
   transition: all 0.3s ease;
 }
@@ -754,18 +750,18 @@
 
 /* Step Node States: Active Current */
 .stepNodeActive .stepIconCircle {
-  background: radial-gradient(circle, #2a2211 0%, #161208 100%);
-  border: 2px solid var(--color-luminous-gold);
-  color: var(--color-luminous-gold);
-  box-shadow: 0 0 16px rgba(254, 240, 138, 0.9), 0 0 30px rgba(212, 175, 55, 0.7);
+  background: var(--color-surface-active);
+  border: 2px solid var(--color-gold-sand);
+  color: var(--color-gold-sand);
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.6), 0 0 30px rgba(212, 175, 55, 0.4);
   transform: scale(1.18);
   animation: pulseGlow 1.2s infinite alternate;
 }
 
 .stepNodeActive .stepTitle {
-  color: var(--color-luminous-gold);
+  color: var(--color-gold-sand);
   font-weight: 700;
-  text-shadow: 0 0 8px rgba(238, 219, 187, 0.6);
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
 }
 
 .stepNodeActive .stepDesc {

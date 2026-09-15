@@ -50,7 +50,7 @@
 
 .btnDownload {
   background: var(--color-gradient-primary);
-  color: white;
+  color: var(--color-bg);
   padding: 0 var(--space-lg);
   height: 44px;
   border-radius: var(--radius-md);
@@ -59,7 +59,7 @@
   align-items: center;
   gap: var(--space-sm);
   transition: all var(--transition-fast);
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+  box-shadow: var(--shadow-gold);
 }
 
 .btnDownload:hover {
@@ -67,7 +67,7 @@
 }
 
 .iframeWrapper {
-  background: #1e293b;
+  background: var(--color-bg-alt);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow: hidden;

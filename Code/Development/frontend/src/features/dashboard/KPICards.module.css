@@ -20,7 +20,7 @@
 
 .card:hover {
   transform: translateY(-2px);
-  border-color: rgba(99, 102, 241, 0.4);
+  border-color: var(--color-accent);
   box-shadow: var(--shadow-md);
 }
 
@@ -65,7 +65,7 @@
 }
 
 .anomalyCard {
-  border-color: rgba(239, 68, 68, 0.3);
+  border-color: var(--color-anomaly);
 }
 
 .anomalyCard .iconWrapper {
@@ -74,11 +74,11 @@
 }
 
 .anomalyCard .value {
-  color: #f87171;
+  color: var(--color-anomaly);
 }
 
 .qualityCard .value {
-  color: #34d399;
+  color: var(--color-success);
 }
 
 /* Responsiveness per Master_prompt §14 */

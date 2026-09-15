@@ -8,9 +8,13 @@ import {
   AlertTriangle,
   Cpu,
 } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 import styles from './Sidebar.module.css';
 
 export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }) {
+  const { theme } = useTheme();
+  const logoSrc = theme === 'light' ? '/logo-light.svg' : '/logo.svg';
+
   const navSections = [
     {
       title: 'Core Studio',
@@ -52,7 +56,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
         title={isCollapsed ? 'Click to Expand Sidebar' : 'Click to Collapse Sidebar'}
       >
         <div className={styles.logoIcon}>
-          <img src="/logo.svg" alt="NexusMind Logo" width="36" height="36" />
+          <img src={logoSrc} alt="NexusMind Logo" width="36" height="36" />
         </div>
         {!isCollapsed && (
           <div className={styles.brandText}>

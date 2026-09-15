@@ -1,5 +1,8 @@
-/* styles/tokens.css — Luxury Gold & Champagne Silk Theme */
-:root {
+/* styles/tokens.css — Luxury Gold & Champagne Silk Theme (Dual Dark / Light Mode) */
+
+/* Default / Dark Luxury Gold Theme */
+:root,
+[data-theme="dark"] {
   /* Luxury Gold Palette */
   --color-gold-sand: #eedbbb;
   --color-pearl-cream: #f3ebdc;
@@ -46,7 +49,89 @@
   --color-info: #eedbbb;
   --color-info-bg: rgba(238, 219, 187, 0.12);
 
-  /* Spacing Scale - Tight & Proportionate (No extra gaps) */
+  /* Glassmorphism & Elevation */
+  --glass-bg: rgba(20, 17, 12, 0.75);
+  --glass-blur: blur(18px);
+  --glass-border: 1px solid rgba(238, 219, 187, 0.13);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 24px rgba(212, 175, 55, 0.22);
+  --shadow-gold: 0 0 16px rgba(238, 219, 187, 0.25);
+
+  /* Scrollbar & Canvas */
+  --scrollbar-track: rgba(12, 10, 7, 0.8);
+  --scrollbar-thumb: rgba(238, 219, 187, 0.2);
+  --canvas-grid: rgba(238, 219, 187, 0.08);
+}
+
+/* Light Theme — Luxurious Warm Ivory, Champagne Silk & Gold (NO BLACK) */
+[data-theme="light"] {
+  /* Luxury Gold Palette */
+  --color-gold-sand: #b38e44;
+  --color-pearl-cream: #423627;
+  --color-ivory-silk: #1f1811;
+  --color-luminous-gold: #8c6d3b;
+  --color-gilded-gold: #c5a059;
+  --color-metallic-gold: #b8860b;
+  --color-bright-gold: #b38e44;
+  --color-bronze-dark: #6e5223;
+
+  /* Background & Surface Palette (Zero black, warm ivory silk & cream) */
+  --color-bg: #fbfaf6;
+  --color-bg-alt: #f4f0e6;
+  --color-surface: rgba(255, 255, 255, 0.88);
+  --color-surface-hover: rgba(212, 175, 55, 0.09);
+  --color-surface-active: rgba(212, 175, 55, 0.18);
+  --color-border: rgba(180, 142, 68, 0.24);
+  --color-border-focus: #b38e44;
+
+  /* Accent & Gradients */
+  --color-accent: #b38e44;
+  --color-accent-hover: #946f29;
+  --color-accent-light: rgba(179, 142, 68, 0.12);
+  --color-accent-2: #8c6d3b;
+  --color-accent-2-hover: #6e5223;
+  --color-gradient-primary: linear-gradient(135deg, #d4af37 0%, #b8860b 45%, #8c6d3b 100%);
+  --color-gradient-gold: linear-gradient(135deg, #c5a059 0%, #b38e44 50%, #8c6d3b 100%);
+  --color-gradient-surface: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(246, 242, 232, 0.9) 100%);
+  --color-gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 244, 235, 0.85) 100%);
+
+  /* Typography & Foreground (Deep warm espresso & charcoal, crisp, zero pure black) */
+  --color-text: #1f1811;
+  --color-text-secondary: #3b3124;
+  --color-muted: #6b5e4c;
+  --color-subtle: #8f816d;
+
+  /* Status Colors (Optimized for light background) */
+  --color-success: #059669;
+  --color-success-bg: rgba(5, 150, 105, 0.12);
+  --color-warning: #d97706;
+  --color-warning-bg: rgba(217, 119, 6, 0.12);
+  --color-anomaly: #dc2626;
+  --color-anomaly-bg: rgba(220, 38, 38, 0.12);
+  --color-info: #b38e44;
+  --color-info-bg: rgba(179, 142, 68, 0.12);
+
+  /* Glassmorphism & Elevation */
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-blur: blur(18px);
+  --glass-border: 1px solid rgba(180, 142, 68, 0.22);
+  --shadow-sm: 0 2px 8px rgba(139, 107, 47, 0.08);
+  --shadow-md: 0 6px 20px rgba(139, 107, 47, 0.12);
+  --shadow-lg: 0 12px 32px rgba(139, 107, 47, 0.16);
+  --shadow-glow: 0 0 24px rgba(212, 175, 55, 0.25);
+  --shadow-gold: 0 0 16px rgba(180, 142, 68, 0.2);
+
+  /* Scrollbar & Canvas */
+  --scrollbar-track: #f4f0e6;
+  --scrollbar-thumb: rgba(180, 142, 68, 0.32);
+  --canvas-grid: rgba(180, 142, 68, 0.12);
+}
+
+/* Shared Global Dimensions & Tokens across both themes */
+:root {
+  /* Spacing Scale */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 14px;
@@ -60,16 +145,6 @@
   --radius-lg: 14px;
   --radius-xl: 20px;
   --radius-full: 9999px;
-
-  /* Glassmorphism & Elevation */
-  --glass-bg: rgba(20, 17, 12, 0.75);
-  --glass-blur: blur(18px);
-  --glass-border: 1px solid rgba(238, 219, 187, 0.13);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 24px rgba(212, 175, 55, 0.22);
-  --shadow-gold: 0 0 16px rgba(238, 219, 187, 0.25);
 
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
