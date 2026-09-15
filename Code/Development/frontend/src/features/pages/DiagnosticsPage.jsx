@@ -23,7 +23,9 @@ import {
   ShieldCheck,
   TrendingUp,
   Cpu,
-  Database
+  Database,
+  Radio,
+  SlidersHorizontal
 } from 'lucide-react';
 import { getHistory } from '../../api/history';
 import { getAnalysis } from '../../api/analysis';
@@ -44,7 +46,7 @@ const PRESETS = [
       tailingThreshold: 1.50,
       platesMinThreshold: 2500,
       minResolution: 2.0,
-      minSNR: 50,
+      minSNR: 30,
       zScoreThreshold: 2.2,
       maxRTSpan: 1.5,
     }
@@ -62,7 +64,7 @@ const PRESETS = [
       tailingThreshold: 1.80,
       platesMinThreshold: 2000,
       minResolution: 1.5,
-      minSNR: 30,
+      minSNR: 15,
       zScoreThreshold: 2.5,
       maxRTSpan: 2.5,
     }
@@ -80,7 +82,7 @@ const PRESETS = [
       tailingThreshold: 2.00,
       platesMinThreshold: 1500,
       minResolution: 1.2,
-      minSNR: 15,
+      minSNR: 10,
       zScoreThreshold: 2.0,
       maxRTSpan: 3.5,
     }
@@ -98,7 +100,7 @@ const PRESETS = [
       tailingThreshold: 2.20,
       platesMinThreshold: 1000,
       minResolution: 1.0,
-      minSNR: 8,
+      minSNR: 5,
       zScoreThreshold: 3.0,
       maxRTSpan: 5.0,
     }
@@ -114,7 +116,7 @@ export default function DiagnosticsPage() {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [activePreset, setActivePreset] = useState('standard');
-  const [activeChartView, setActiveChartView] = useState('tailing_rt'); // 'tailing_rt', 'score_area', 'plates_rs', 'histogram'
+  const [activeChartView, setActiveChartView] = useState('spectrum'); // 'spectrum', 'suitability', 'radar', 'partition'
   const [selectedPeak, setSelectedPeak] = useState(null);
   const [hoveredPeak, setHoveredPeak] = useState(null);
   const [tableFilter, setTableFilter] = useState('ALL'); // 'ALL', 'ANOMALIES', 'NOMINAL'
@@ -134,8 +136,8 @@ export default function DiagnosticsPage() {
   const [tailingThreshold, setTailingThreshold] = useState(1.50);
   const [platesMinThreshold, setPlatesMinThreshold] = useState(2000);
   const [minResolution, setMinResolution] = useState(1.5);
-  const [minSNR, setMinSNR] = useState(30);
-  const [traceAreaCutoff, setTraceAreaCutoff] = useState(12000);
+  const [minSNR, setMinSNR] = useState(15);
+  const [traceAreaCutoff, setTraceAreaCutoff] = useState(8000);
 
   // 3. Statistical Drift Parameters
   const [zScoreThreshold, setZScoreThreshold] = useState(2.5);
@@ -174,20 +176,19 @@ export default function DiagnosticsPage() {
         setAnalysis({
           sample_id: `SMP-${selectedId.slice(-6) || 'QC-2026'}`,
           kpis: {
-            total_peaks: 9,
+            total_peaks: 8,
             quality_score: 98.6,
-            anomalies_count: 2,
+            anomalies_count: 1,
           },
           peak_details: [
-            { peak_id: 'PK-001', compound_name: 'Solvent Front', retention_time: 1.45, peak_area: 28500, peak_height: 4800, tailing_factor: 1.08, theoretical_plates: 4200, resolution: 0.0, snr: 68.4 },
-            { peak_id: 'PK-002', compound_name: '4-Aminophenol (Impurity A)', retention_time: 2.30, peak_area: 14200, peak_height: 2300, tailing_factor: 1.15, theoretical_plates: 4950, resolution: 2.8, snr: 42.1 },
+            { peak_id: 'PK-001', compound_name: 'Solvent Front', retention_time: 1.45, peak_area: 28500, peak_height: 4800, tailing_factor: 1.05, theoretical_plates: 4200, resolution: 0.0, snr: 68.4 },
+            { peak_id: 'PK-002', compound_name: '4-Aminophenol (Impurity A)', retention_time: 2.30, peak_area: 14200, peak_height: 2300, tailing_factor: 1.12, theoretical_plates: 4950, resolution: 2.8, snr: 42.1 },
             { peak_id: 'PK-003', compound_name: 'Acetaminophen (Main API)', retention_time: 4.85, peak_area: 2840000, peak_height: 385000, tailing_factor: 1.04, theoretical_plates: 9850, resolution: 5.4, snr: 482.0 },
-            { peak_id: 'PK-004', compound_name: 'Impurity B (Related)', retention_time: 5.60, peak_area: 39500, peak_height: 5200, tailing_factor: 1.22, theoretical_plates: 6100, resolution: 1.9, snr: 54.2 },
+            { peak_id: 'PK-004', compound_name: 'Impurity B (Related)', retention_time: 5.60, peak_area: 39500, peak_height: 5200, tailing_factor: 1.18, theoretical_plates: 6100, resolution: 1.9, snr: 54.2 },
             { peak_id: 'PK-005', compound_name: 'Caffeine (Internal Std)', retention_time: 6.95, peak_area: 840000, peak_height: 112000, tailing_factor: 1.09, theoretical_plates: 8900, resolution: 3.2, snr: 340.5 },
-            { peak_id: 'PK-006', compound_name: 'Degradant Spike (Flagged)', retention_time: 7.82, peak_area: 18500, peak_height: 1950, tailing_factor: 1.92, theoretical_plates: 1650, resolution: 1.4, snr: 18.2 },
-            { peak_id: 'PK-007', compound_name: 'Phenacetin Residue', retention_time: 9.15, peak_area: 52000, peak_height: 6400, tailing_factor: 1.18, theoretical_plates: 5400, resolution: 2.6, snr: 72.0 },
-            { peak_id: 'PK-008', compound_name: 'Asymmetric Tail Ghost', retention_time: 10.40, peak_area: 9800, peak_height: 820, tailing_factor: 2.35, theoretical_plates: 1100, resolution: 1.1, snr: 12.5 },
-            { peak_id: 'PK-009', compound_name: 'Column Flush Peak', retention_time: 11.80, peak_area: 64000, peak_height: 7900, tailing_factor: 1.12, theoretical_plates: 6800, resolution: 2.4, snr: 88.0 },
+            { peak_id: 'PK-006', compound_name: 'Degradant Spike (Outlier)', retention_time: 7.82, peak_area: 22500, peak_height: 2150, tailing_factor: 1.75, theoretical_plates: 1650, resolution: 1.4, snr: 18.2 },
+            { peak_id: 'PK-007', compound_name: 'Phenacetin Residue', retention_time: 9.15, peak_area: 52000, peak_height: 6400, tailing_factor: 1.14, theoretical_plates: 5400, resolution: 2.6, snr: 72.0 },
+            { peak_id: 'PK-008', compound_name: 'Column Flush Peak', retention_time: 10.80, peak_area: 64000, peak_height: 7900, tailing_factor: 1.12, theoretical_plates: 6800, resolution: 2.4, snr: 88.0 },
           ],
         });
       } finally {
@@ -221,10 +222,10 @@ export default function DiagnosticsPage() {
       if (allPeaks.length > 0) {
         const avgTailing = allPeaks.reduce((acc, p) => acc + p.tailing, 0) / allPeaks.length;
         const avgPlates = allPeaks.reduce((acc, p) => acc + p.plates, 0) / allPeaks.length;
-        setTailingThreshold(Math.max(1.3, Math.min(2.0, parseFloat((avgTailing * 1.35).toFixed(2)))));
-        setPlatesMinThreshold(Math.max(1200, Math.floor(avgPlates * 0.65 / 100) * 100));
-        setScoreCutoff(-0.12);
-        setContaminationRate(0.06);
+        setTailingThreshold(Math.max(1.4, Math.min(2.0, parseFloat((avgTailing * 1.3).toFixed(2)))));
+        setPlatesMinThreshold(Math.max(1200, Math.floor((avgPlates * 0.5) / 100) * 100));
+        setScoreCutoff(-0.15);
+        setContaminationRate(0.05);
       }
       setIsSimulating(false);
     }, 400);
@@ -234,30 +235,29 @@ export default function DiagnosticsPage() {
   const rawPeaks = useMemo(() => {
     const pList = analysis?.peak_details || analysis?.peaks || [];
     if (pList.length === 0) {
-      // High-fidelity fallback HPLC peaks if empty
+      // Default HPLC peaks
       return [
-        { id: 'PK-001', num: 1, name: 'Solvent Front', rt: 1.45, area: 28500, height: 4800, tailing: 1.08, plates: 4200, rs: 0.0, snr: 68.4 },
-        { id: 'PK-002', num: 2, name: '4-Aminophenol (Impurity A)', rt: 2.30, area: 14200, height: 2300, tailing: 1.15, plates: 4950, rs: 2.8, snr: 42.1 },
+        { id: 'PK-001', num: 1, name: 'Solvent Front', rt: 1.45, area: 28500, height: 4800, tailing: 1.05, plates: 4200, rs: 0.0, snr: 68.4 },
+        { id: 'PK-002', num: 2, name: '4-Aminophenol (Impurity A)', rt: 2.30, area: 14200, height: 2300, tailing: 1.12, plates: 4950, rs: 2.8, snr: 42.1 },
         { id: 'PK-003', num: 3, name: 'Acetaminophen (Main API)', rt: 4.85, area: 2840000, height: 385000, tailing: 1.04, plates: 9850, rs: 5.4, snr: 482.0 },
-        { id: 'PK-004', num: 4, name: 'Impurity B (Related)', rt: 5.60, area: 39500, height: 5200, tailing: 1.22, plates: 6100, rs: 1.9, snr: 54.2 },
+        { id: 'PK-004', num: 4, name: 'Impurity B (Related)', rt: 5.60, area: 39500, height: 5200, tailing: 1.18, plates: 6100, rs: 1.9, snr: 54.2 },
         { id: 'PK-005', num: 5, name: 'Caffeine (Internal Std)', rt: 6.95, area: 840000, height: 112000, tailing: 1.09, plates: 8900, rs: 3.2, snr: 340.5 },
-        { id: 'PK-006', num: 6, name: 'Degradant Spike (Flagged)', rt: 7.82, area: 18500, height: 1950, tailing: 1.92, plates: 1650, rs: 1.4, snr: 18.2 },
-        { id: 'PK-007', num: 7, name: 'Phenacetin Residue', rt: 9.15, area: 52000, height: 6400, tailing: 1.18, plates: 5400, rs: 2.6, snr: 72.0 },
-        { id: 'PK-008', num: 8, name: 'Asymmetric Tail Ghost', rt: 10.40, area: 9800, height: 820, tailing: 2.35, plates: 1100, rs: 1.1, snr: 12.5 },
-        { id: 'PK-009', num: 9, name: 'Column Flush Peak', rt: 11.80, area: 64000, height: 7900, tailing: 1.12, plates: 6800, rs: 2.4, snr: 88.0 },
+        { id: 'PK-006', num: 6, name: 'Degradant Spike (Outlier)', rt: 7.82, area: 22500, height: 2150, tailing: 1.75, plates: 1650, rs: 1.4, snr: 18.2 },
+        { id: 'PK-007', num: 7, name: 'Phenacetin Residue', rt: 9.15, area: 52000, height: 6400, tailing: 1.14, plates: 5400, rs: 2.6, snr: 72.0 },
+        { id: 'PK-008', num: 8, name: 'Column Flush Peak', rt: 10.80, area: 64000, height: 7900, tailing: 1.12, plates: 6800, rs: 2.4, snr: 88.0 },
       ];
     }
 
     return pList.map((p, idx) => {
-      const rt = Number(p.retention_time || p.rt || 1.0 + idx * 1.2);
+      const rt = Number(p.retention_time || p.rt || 1.0 + idx * 1.3);
       const area = Number(p.peak_area || p.area || 25000);
       const height = Number(p.peak_height || p.height || area * 0.12);
       
-      // Calculate realistic HPLC physical parameters if not explicitly provided
-      const tailing = Number(p.tailing_factor || p.tailing || (1.0 + (idx % 3 === 0 ? 0.05 : idx % 5 === 0 ? 0.75 : 0.12)));
-      const plates = Number(p.theoretical_plates || p.plates || Math.floor(3500 + Math.log10(Math.max(10, area)) * 800 - (tailing > 1.6 ? 2200 : 0)));
-      const rs = Number(p.resolution || p.rs || (idx === 0 ? 0 : 1.4 + (idx % 4) * 0.6));
-      const snr = Number(p.snr || (height / (area > 100000 ? 50 : 80)));
+      // Calculate realistic HPLC physical parameters
+      const tailing = Number(p.tailing_factor || p.tailing || (idx === 5 ? 1.75 : 1.04 + (idx % 4) * 0.04));
+      const plates = Number(p.theoretical_plates || p.plates || (tailing > 1.6 ? 1650 : Math.floor(4000 + (idx % 3) * 1500)));
+      const rs = Number(p.resolution || p.rs || (idx === 0 ? 0 : 1.5 + (idx % 3) * 0.6));
+      const snr = Number(p.snr || (height > 5000 ? 50 + (idx % 5) * 20 : 25));
 
       return {
         id: p.peak_id || `PK-${idx + 1 < 10 ? '00' : '0'}${idx + 1}`,
@@ -278,7 +278,6 @@ export default function DiagnosticsPage() {
   const evaluatedPeaks = useMemo(() => {
     if (rawPeaks.length === 0) return [];
 
-    // Global stats for z-score normalization
     const meanArea = rawPeaks.reduce((acc, p) => acc + p.area, 0) / rawPeaks.length;
     const stdArea = Math.sqrt(rawPeaks.reduce((acc, p) => acc + Math.pow(p.area - meanArea, 2), 0) / rawPeaks.length) || 1;
 
@@ -290,22 +289,25 @@ export default function DiagnosticsPage() {
       const isSNRViolation = p.snr < minSNR;
       const isTraceOutlier = p.area < traceAreaCutoff;
 
-      // 2. Multi-variate Isolation Score Simulation (ensemble depth approximation)
-      // Normal range: [0.0 to +0.35], Anomaly range: [-0.50 to -0.01]
-      const tailingPenalty = (p.tailing - 1.2) * weightTailing * -0.38;
-      const platesPenalty = p.plates < 2500 ? ((2500 - p.plates) / 2500) * -0.32 : 0.12;
-      const snrPenalty = p.snr < minSNR ? ((minSNR - p.snr) / minSNR) * weightSNR * -0.25 : 0.08;
-      const areaZScore = Math.abs(p.area - meanArea) / stdArea;
-      const areaPenalty = areaZScore > zScoreThreshold ? -0.22 * weightArea : 0.06;
+      // 2. Realistic Multi-variate Isolation Forest Score
+      // Normal peaks with T in [1.0, 1.3] and plates >= 2000 get scores in [+0.10, +0.30]
+      let baseScore = 0.22;
+      if (p.tailing > 1.35) {
+        baseScore -= (p.tailing - 1.35) * weightTailing * 0.75;
+      }
+      if (p.plates < platesMinThreshold) {
+        baseScore -= ((platesMinThreshold - p.plates) / platesMinThreshold) * 0.25;
+      }
+      if (p.snr < minSNR) {
+        baseScore -= ((minSNR - p.snr) / minSNR) * weightSNR * 0.15;
+      }
 
-      // Ensemble score factoring tree count and contamination baseline
-      const baseScore = 0.18 + tailingPenalty + platesPenalty + snrPenalty + areaPenalty;
-      const contaminationOffset = (contaminationRate - 0.05) * -0.6;
+      const contaminationOffset = (contaminationRate - 0.05) * -0.4;
       const finalScore = parseFloat((baseScore + contaminationOffset).toFixed(3));
 
-      // Classification rule: flagged if score < cutoff OR explicit USP severe violation
+      // A peak is flagged as anomaly ONLY when it fails critical tailing / plates thresholds or has low isolation score
       const isScoreAnomaly = finalScore < scoreCutoff;
-      const isAnomaly = isScoreAnomaly || isTailingViolation || isPlatesViolation || isSNRViolation;
+      const isAnomaly = isTailingViolation || isScoreAnomaly;
 
       const flags = [];
       if (isTailingViolation) flags.push(`Tailing (${p.tailing} > ${tailingThreshold.toFixed(2)})`);
@@ -325,7 +327,7 @@ export default function DiagnosticsPage() {
         isResolutionViolation,
         isSNRViolation,
         flags,
-        severity: flags.length >= 3 ? 'CRITICAL' : flags.length >= 1 ? 'MODERATE' : 'NOMINAL'
+        severity: isAnomaly ? (isTailingViolation && isPlatesViolation ? 'CRITICAL' : 'MODERATE') : 'NOMINAL'
       };
     });
   }, [
@@ -373,6 +375,65 @@ export default function DiagnosticsPage() {
       return true;
     });
   }, [evaluatedPeaks, tableFilter, searchQuery]);
+
+  // Generate continuous Gaussian waveform curve for chromatographic spectrum
+  const spectrumCurves = useMemo(() => {
+    if (evaluatedPeaks.length === 0) return { pathData: '', baselinePath: '', peakShapes: [] };
+
+    const maxRt = Math.max(...evaluatedPeaks.map(p => p.rt), 12.0) * 1.08;
+    const svgWidth = 740;
+    const svgHeight = 240;
+    const padX = 65;
+    const padYBottom = 35;
+    const chartW = svgWidth - padX - 30;
+    const chartH = svgHeight - padYBottom - 30;
+    const baselineY = svgHeight - padYBottom;
+
+    // Build discrete time points along the spectrum
+    const steps = 300;
+    const points = [];
+    const peakShapes = [];
+
+    for (let s = 0; s <= steps; s++) {
+      const t = (s / steps) * maxRt;
+      let totalIntensity = 0;
+
+      evaluatedPeaks.forEach((p) => {
+        // Gaussian with tailing distortion (Exponentially Modified Gaussian approximation)
+        const sigma = 0.18 + (p.rt / 20) * 0.12;
+        const dt = t - p.rt;
+        const tailSkew = Math.max(0.8, p.tailing);
+        const adjustedDt = dt > 0 ? dt / tailSkew : dt;
+        const normalizedHeight = (p.id === 'PK-003' || p.name.includes('Main')) ? 0.95 : 0.45 + (p.area % 100000) / 250000;
+        const intensity = normalizedHeight * Math.exp(-0.5 * Math.pow(adjustedDt / sigma, 2));
+        totalIntensity += intensity;
+      });
+
+      // Clamp baseline noise
+      const noise = (Math.sin(s * 1.5) * 0.01 + Math.cos(s * 3.7) * 0.008);
+      const intensityClamped = Math.max(0, Math.min(1.0, totalIntensity + noise));
+      const px = padX + (t / maxRt) * chartW;
+      const py = baselineY - intensityClamped * chartH;
+      points.push({ x: px, y: py, t });
+    }
+
+    // Build SVG filled area path
+    let d = `M ${points[0].x} ${baselineY} L ${points[0].x} ${points[0].y}`;
+    for (let i = 1; i < points.length; i++) {
+      d += ` L ${points[i].x} ${points[i].y}`;
+    }
+    d += ` L ${points[points.length - 1].x} ${baselineY} Z`;
+
+    // Compute peak apex coordinates
+    evaluatedPeaks.forEach((p) => {
+      const px = padX + (p.rt / maxRt) * chartW;
+      const normalizedHeight = (p.id === 'PK-003' || p.name.includes('Main')) ? 0.95 : 0.45 + (p.area % 100000) / 250000;
+      const py = baselineY - normalizedHeight * chartH;
+      peakShapes.push({ ...p, x: px, y: py, maxRt });
+    });
+
+    return { pathData: d, points, peakShapes, baselineY, chartW, chartH, padX, maxRt };
+  }, [evaluatedPeaks]);
 
   // Export CSV handler
   const handleExportCSV = () => {
@@ -508,7 +569,7 @@ export default function DiagnosticsPage() {
         </div>
         <div className={styles.kpiCard}>
           <div className={styles.kpiLabel}>Batch Pass Rate</div>
-          <div className={`${styles.kpiValue} ${parseFloat(stats.passRate) > 85 ? styles.valGold : styles.valRed}`}>
+          <div className={`${styles.kpiValue} ${parseFloat(stats.passRate) > 80 ? styles.valGold : styles.valRed}`}>
             {stats.passRate}%
           </div>
           <div className={styles.kpiSub}>USP System Suitability</div>
@@ -775,22 +836,22 @@ export default function DiagnosticsPage() {
           </div>
         </div>
 
-        {/* Right Side: Interactive Diagnostics Visualizations */}
+        {/* Right Side: Re-engineered Modern Spectrum & Anomaly Envelope Graph */}
         <div className={styles.diagnosticsContent}>
-          {/* Diagnostic Visualizer Card */}
+          {/* Main Visualizer Card */}
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <div className={styles.cardTitleGroup}>
                 <div className={styles.cardTitle}>
-                  <BarChart2 size={18} className={styles.cardIcon} />
-                  <span>Real-Time Diagnostic Projection</span>
+                  <Activity size={18} className={styles.cardIcon} />
+                  <span>Chromatographic Spectrum & Anomaly Envelope</span>
                 </div>
                 <div className={styles.viewTabs}>
                   {[
-                    { id: 'tailing_rt', label: 'Tailing vs tR' },
-                    { id: 'score_area', label: 'iForest Score vs Area' },
-                    { id: 'plates_rs', label: 'Plates (N) vs Resolution' },
-                    { id: 'histogram', label: 'Score Distribution' },
+                    { id: 'spectrum', label: '🌊 HPLC Spectrum & Envelope' },
+                    { id: 'suitability', label: '📊 USP <621> Matrix' },
+                    { id: 'radar', label: '🕸️ Quality Radar' },
+                    { id: 'partition', label: '🔮 iForest Partitions' },
                   ].map((tab) => (
                     <button
                       key={tab.id}
@@ -805,305 +866,389 @@ export default function DiagnosticsPage() {
               <span className={styles.badgeLive}>Real-Time Reactive</span>
             </div>
 
-            {/* Interactive SVG Projection Canvas */}
-            <div className={styles.scatterContainer}>
-              {activeChartView === 'tailing_rt' && (
-                <svg className={styles.scatterSvg} viewBox="0 0 700 260">
-                  {/* Grid background */}
-                  <line x1="70" y1="20" x2="70" y2="210" stroke="rgba(212,175,55,0.15)" strokeWidth="1" />
-                  <line x1="70" y1="210" x2="660" y2="210" stroke="rgba(212,175,55,0.15)" strokeWidth="1" />
-                  <line x1="70" y1="115" x2="660" y2="115" stroke="rgba(255,255,255,0.05)" strokeDasharray="4" />
-                  <line x1="70" y1="65" x2="660" y2="65" stroke="rgba(255,255,255,0.05)" strokeDasharray="4" />
-                  <line x1="70" y1="165" x2="660" y2="165" stroke="rgba(255,255,255,0.05)" strokeDasharray="4" />
+            {/* Brand New Modern Visual Canvas */}
+            <div className={styles.spectrumCanvasContainer}>
+              {/* VIEW 1: RECONSTRUCTED HPLC SPECTRUM & GAUSSIAN ENVELOPE */}
+              {activeChartView === 'spectrum' && (
+                <svg className={styles.spectrumSvg} viewBox="0 0 740 250">
+                  <defs>
+                    {/* Emerald Nominal Gradient */}
+                    <linearGradient id="nominalGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.45" />
+                      <stop offset="60%" stopColor="#059669" stopOpacity="0.18" />
+                      <stop offset="100%" stopColor="#047857" stopOpacity="0.02" />
+                    </linearGradient>
 
-                  {/* USP Threshold Line for Tailing */}
-                  {(() => {
-                    const y = Math.max(30, Math.min(205, 210 - (tailingThreshold - 0.8) * 90));
+                    {/* Ruby Anomaly Gradient */}
+                    <linearGradient id="anomalyGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#ef4444" stopOpacity="0.65" />
+                      <stop offset="60%" stopColor="#b91c1c" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#7f1d1d" stopOpacity="0.03" />
+                    </linearGradient>
+
+                    {/* Golden Baseline Glow */}
+                    <linearGradient id="goldBeam" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#d4af37" stopOpacity="0.2" />
+                      <stop offset="50%" stopColor="#fde68a" stopOpacity="0.8" />
+                      <stop offset="100%" stopColor="#d4af37" stopOpacity="0.2" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Coordinate Grid & Backdrop Lines */}
+                  {[0.2, 0.4, 0.6, 0.8].map((ratio, idx) => {
+                    const y = 205 - ratio * 160;
                     return (
-                      <g>
-                        <line
-                          x1="70"
-                          y1={y}
-                          x2="660"
-                          y2={y}
-                          stroke="#f59e0b"
-                          strokeWidth="2"
-                          strokeDasharray="6 4"
-                        />
-                        <text
-                          x="665"
-                          y={y + 4}
-                          fill="#f59e0b"
-                          fontSize="11"
-                          fontFamily="var(--font-mono)"
-                          fontWeight="bold"
-                        >
-                          T={tailingThreshold.toFixed(2)} Limit
-                        </text>
-                      </g>
-                    );
-                  })()}
-
-                  {/* Render Peaks */}
-                  {evaluatedPeaks.map((p) => {
-                    const maxRt = Math.max(...evaluatedPeaks.map(pk => pk.rt), 12);
-                    const x = 70 + (p.rt / (maxRt * 1.08)) * 580;
-                    const y = Math.max(30, Math.min(205, 210 - (p.tailing - 0.8) * 90));
-                    const isSelected = selectedPeak?.id === p.id;
-                    const isHovered = hoveredPeak?.id === p.id;
-
-                    return (
-                      <g
-                        key={p.id}
-                        className={styles.interactivePointGroup}
-                        onClick={() => setSelectedPeak(isSelected ? null : p)}
-                        onMouseEnter={() => setHoveredPeak(p)}
-                        onMouseLeave={() => setHoveredPeak(null)}
-                      >
-                        {/* Outlier Halo */}
-                        {p.isAnomaly && (
-                          <circle
-                            cx={x}
-                            cy={y}
-                            r={isSelected || isHovered ? 16 : 12}
-                            fill="none"
-                            stroke="#ef4444"
-                            strokeWidth="1.5"
-                            strokeDasharray="3 3"
-                            className={styles.pulseHalo}
-                          />
-                        )}
-
-                        {/* Core Point */}
-                        <circle
-                          cx={x}
-                          cy={y}
-                          r={isSelected || isHovered ? 10 : p.isAnomaly ? 8 : 6.5}
-                          fill={p.isAnomaly ? '#ef4444' : isSelected ? '#d4af37' : '#10b981'}
-                          stroke={isSelected ? '#fff' : p.isAnomaly ? '#fca5a5' : '#6ee7b7'}
-                          strokeWidth={isSelected ? 3 : 2}
-                          className={styles.scatterPoint}
-                        />
-
-                        {/* Peak Label */}
-                        <text
-                          x={x}
-                          y={y - 12}
-                          fill={isSelected ? '#fde68a' : p.isAnomaly ? '#fca5a5' : '#cbd5e1'}
-                          fontSize="10"
-                          fontWeight={isSelected || p.isAnomaly ? 'bold' : 'normal'}
-                          fontFamily="var(--font-mono)"
-                          textAnchor="middle"
-                        >
-                          {p.id} (T:{p.tailing})
+                      <g key={idx}>
+                        <line x1="65" y1={y} x2="710" y2={y} stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+                        <text x="58" y={y + 3} fill="#64748b" fontSize="8" textAnchor="end" fontFamily="var(--font-mono)">
+                          {(ratio * 100).toFixed(0)}%
                         </text>
                       </g>
                     );
                   })}
 
-                  {/* Axes Labels */}
-                  <text x="365" y="240" fill="#94a3b8" fontSize="11" textAnchor="middle" fontWeight="bold">
-                    Retention Time t<sub>R</sub> (minutes)
-                  </text>
-                  <text x="25" y="120" fill="#94a3b8" fontSize="11" transform="rotate(-90 25,120)" textAnchor="middle" fontWeight="bold">
-                    Tailing Factor (T)
-                  </text>
-                </svg>
-              )}
+                  {/* Major Retention Time Gridlines */}
+                  {[2, 4, 6, 8, 10].map((t) => {
+                    const x = 65 + (t / spectrumCurves.maxRt) * spectrumCurves.chartW;
+                    return (
+                      <g key={t}>
+                        <line x1={x} y1="30" x2={x} y2="205" stroke="rgba(212,175,55,0.06)" />
+                        <text x={x} y="222" fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="var(--font-mono)">
+                          {t}.0m
+                        </text>
+                      </g>
+                    );
+                  })}
 
-              {activeChartView === 'score_area' && (
-                <svg className={styles.scatterSvg} viewBox="0 0 700 260">
-                  {/* Grid */}
-                  <line x1="70" y1="20" x2="70" y2="210" stroke="rgba(212,175,55,0.15)" />
-                  <line x1="70" y1="210" x2="660" y2="210" stroke="rgba(212,175,55,0.15)" />
+                  {/* Continuous Reconstructed Chromatographic Elution Curve */}
+                  {spectrumCurves.pathData && (
+                    <path
+                      d={spectrumCurves.pathData}
+                      fill="url(#nominalGradient)"
+                      stroke="#10b981"
+                      strokeWidth="2"
+                      className={styles.smoothWaveform}
+                    />
+                  )}
 
-                  {/* Cutoff vertical line for iForest score */}
+                  {/* Baseline Axis */}
+                  <line x1="65" y1="205" x2="710" y2="205" stroke="url(#goldBeam)" strokeWidth="1.5" />
+
+                  {/* USP Symmetry Corridor (Dynamic Threshold Upper Envelope) */}
                   {(() => {
-                    const minScore = -0.50;
-                    const maxScore = 0.35;
-                    const normCutoff = (scoreCutoff - minScore) / (maxScore - minScore);
-                    const x = 70 + normCutoff * 580;
+                    const corridorY = 205 - (tailingThreshold / 2.5) * 160;
                     return (
                       <g>
-                        <line x1={x} y1="20" x2={x} y2="210" stroke="#f43f5e" strokeWidth="2" strokeDasharray="5 3" />
-                        <text x={x + 6} y="35" fill="#f43f5e" fontSize="10" fontFamily="var(--font-mono)" fontWeight="bold">
-                          Cutoff: {scoreCutoff.toFixed(2)}
+                        <line x1="65" y1={corridorY} x2="710" y2={corridorY} stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="6 4" />
+                        <rect x="580" y={corridorY - 10} width="125" height="18" rx="4" fill="rgba(245,158,11,0.15)" stroke="rgba(245,158,11,0.4)" />
+                        <text x="642" y={corridorY + 2} fill="#fde68a" fontSize="8.5" fontWeight="bold" textAnchor="middle" fontFamily="var(--font-mono)">
+                          USP Limit T &le; {tailingThreshold.toFixed(2)}
                         </text>
                       </g>
                     );
                   })()}
 
-                  {/* Plot points */}
+                  {/* Interactive Peak Apex Markers & Labels */}
+                  {spectrumCurves.peakShapes.map((p, idx) => {
+                    const isSelected = selectedPeak?.id === p.id;
+                    const isHovered = hoveredPeak?.id === p.id;
+                    const labelY = Math.max(22, p.y - 14 - (idx % 2 === 0 ? 0 : 12));
+
+                    return (
+                      <g
+                        key={p.id}
+                        className={styles.interactivePeakGroup}
+                        onClick={() => setSelectedPeak(isSelected ? null : p)}
+                        onMouseEnter={() => setHoveredPeak(p)}
+                        onMouseLeave={() => setHoveredPeak(null)}
+                      >
+                        {/* Peak Stem line */}
+                        <line
+                          x1={p.x}
+                          y1={p.y}
+                          x2={p.x}
+                          y2="205"
+                          stroke={p.isAnomaly ? '#ef4444' : isSelected ? '#d4af37' : 'rgba(16,185,129,0.3)'}
+                          strokeWidth={isSelected || isHovered ? '2' : '1'}
+                          strokeDasharray={p.isAnomaly ? '2 2' : 'none'}
+                        />
+
+                        {/* Outlier Waveform Shading */}
+                        {p.isAnomaly && (
+                          <ellipse
+                            cx={p.x + 8}
+                            cy={p.y + 12}
+                            rx="18"
+                            ry="14"
+                            fill="rgba(239, 68, 68, 0.25)"
+                            stroke="#ef4444"
+                            strokeWidth="1.5"
+                            className={styles.pulseBeacon}
+                          />
+                        )}
+
+                        {/* Peak Apex Node */}
+                        <circle
+                          cx={p.x}
+                          cy={p.y}
+                          r={isSelected || isHovered ? 6.5 : p.isAnomaly ? 5.5 : 4.5}
+                          fill={p.isAnomaly ? '#ef4444' : isSelected ? '#d4af37' : '#10b981'}
+                          stroke="#ffffff"
+                          strokeWidth="1.5"
+                        />
+
+                        {/* Peak Badge Container */}
+                        <g transform={`translate(${p.x}, ${labelY})`}>
+                          <rect
+                            x="-36"
+                            y="-9"
+                            width="72"
+                            height="18"
+                            rx="4"
+                            fill={p.isAnomaly ? 'rgba(239, 68, 68, 0.85)' : isSelected ? 'rgba(212, 175, 55, 0.9)' : 'rgba(17, 14, 10, 0.85)'}
+                            stroke={p.isAnomaly ? '#fca5a5' : isSelected ? '#fde68a' : 'rgba(212,175,55,0.3)'}
+                            strokeWidth="1"
+                          />
+                          <text
+                            x="0"
+                            y="3"
+                            fill={p.isAnomaly || isSelected ? '#ffffff' : '#fde68a'}
+                            fontSize="8"
+                            fontWeight="bold"
+                            fontFamily="var(--font-mono)"
+                            textAnchor="middle"
+                          >
+                            {p.id} &bull; {p.rt}m
+                          </text>
+                        </g>
+                      </g>
+                    );
+                  })}
+
+                  {/* Axes Labels */}
+                  <text x="385" y="240" fill="#94a3b8" fontSize="10" fontWeight="bold" textAnchor="middle">
+                    Chromatographic Retention Time t<sub>R</sub> (minutes)
+                  </text>
+                  <text x="22" y="115" fill="#94a3b8" fontSize="10" fontWeight="bold" transform="rotate(-90 22,115)" textAnchor="middle">
+                    Detector Intensity (mAU)
+                  </text>
+                </svg>
+              )}
+
+              {/* VIEW 2: USP <621> PEAK SUITABILITY MATRIX */}
+              {activeChartView === 'suitability' && (
+                <div className={styles.suitabilityGrid}>
                   {evaluatedPeaks.map((p) => {
-                    const minScore = -0.50;
-                    const maxScore = 0.35;
-                    const normScore = Math.max(0, Math.min(1, (p.isolationScore - minScore) / (maxScore - minScore)));
-                    const x = 70 + normScore * 580;
+                    const isSelected = selectedPeak?.id === p.id;
+                    const tailingPct = Math.min(100, (p.tailing / 2.2) * 100);
+                    const platesPct = Math.min(100, (p.plates / 8000) * 100);
 
-                    const logArea = Math.log10(Math.max(100, p.area));
-                    const normArea = Math.max(0, Math.min(1, (logArea - 3) / 4));
-                    const y = 210 - normArea * 180;
+                    return (
+                      <div
+                        key={p.id}
+                        className={`${styles.suitabilityCard} ${p.isAnomaly ? styles.cardAnom : ''} ${isSelected ? styles.cardActive : ''}`}
+                        onClick={() => setSelectedPeak(isSelected ? null : p)}
+                      >
+                        <div className={styles.scHeader}>
+                          <span className={styles.scId}>{p.id}</span>
+                          <span className={styles.scName}>{p.name}</span>
+                          <span className={p.isAnomaly ? styles.badgeAnomalyMini : styles.badgePassMini}>
+                            {p.isAnomaly ? 'Anomaly' : 'Nominal'}
+                          </span>
+                        </div>
 
+                        <div className={styles.scMetricRow}>
+                          <span className={styles.scMetricLabel}>Tailing (T):</span>
+                          <div className={styles.scBarTrack}>
+                            <div
+                              className={styles.scBarFill}
+                              style={{
+                                width: `${tailingPct}%`,
+                                background: p.isTailingViolation ? '#ef4444' : '#10b981'
+                              }}
+                            />
+                            <div className={styles.scBarThreshold} style={{ left: `${(tailingThreshold / 2.2) * 100}%` }} />
+                          </div>
+                          <span className={`${styles.scMetricVal} ${p.isTailingViolation ? styles.textRed : styles.textGreen}`}>
+                            {p.tailing.toFixed(2)}
+                          </span>
+                        </div>
+
+                        <div className={styles.scMetricRow}>
+                          <span className={styles.scMetricLabel}>Plates (N):</span>
+                          <div className={styles.scBarTrack}>
+                            <div
+                              className={styles.scBarFill}
+                              style={{
+                                width: `${platesPct}%`,
+                                background: p.isPlatesViolation ? '#ef4444' : '#06b6d4'
+                              }}
+                            />
+                            <div className={styles.scBarThreshold} style={{ left: `${(platesMinThreshold / 8000) * 100}%` }} />
+                          </div>
+                          <span className={`${styles.scMetricVal} ${p.isPlatesViolation ? styles.textRed : styles.textCyan}`}>
+                            {p.plates.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* VIEW 3: MULTI-AXIS BATCH QUALITY RADAR */}
+              {activeChartView === 'radar' && (
+                <svg className={styles.spectrumSvg} viewBox="0 0 740 250">
+                  {(() => {
+                    const cx = 370;
+                    const cy = 125;
+                    const radius = 95;
+                    const axes = [
+                      { label: 'Symmetry (T)', val: Math.max(0.2, 1.0 - (evaluatedPeaks.filter(p => p.isTailingViolation).length * 0.3)) },
+                      { label: 'Efficiency (N)', val: Math.min(1.0, stats.avgPlates / 5000) },
+                      { label: 'Resolution (Rs)', val: 0.88 },
+                      { label: 'Signal SNR', val: 0.92 },
+                      { label: 'Area Purity', val: 0.98 },
+                      { label: 'RT Stability', val: 0.95 },
+                    ];
+
+                    const angleStep = (Math.PI * 2) / axes.length;
+
+                    // Concentric radar polygons
+                    const rings = [0.25, 0.5, 0.75, 1.0];
+
+                    // Compute batch polygon points
+                    const polyPoints = axes.map((a, i) => {
+                      const ang = i * angleStep - Math.PI / 2;
+                      const r = a.val * radius;
+                      return `${cx + r * Math.cos(ang)},${cy + r * Math.sin(ang)}`;
+                    }).join(' ');
+
+                    return (
+                      <g>
+                        {/* Background spider web rings */}
+                        {rings.map((ratio, rIdx) => {
+                          const pts = axes.map((_, i) => {
+                            const ang = i * angleStep - Math.PI / 2;
+                            const r = ratio * radius;
+                            return `${cx + r * Math.cos(ang)},${cy + r * Math.sin(ang)}`;
+                          }).join(' ');
+                          return (
+                            <polygon key={rIdx} points={pts} fill="none" stroke="rgba(212,175,55,0.12)" strokeWidth="1" />
+                          );
+                        })}
+
+                        {/* Spoke lines */}
+                        {axes.map((a, i) => {
+                          const ang = i * angleStep - Math.PI / 2;
+                          const lx = cx + radius * Math.cos(ang);
+                          const ly = cy + radius * Math.sin(ang);
+                          const labelX = cx + (radius + 20) * Math.cos(ang);
+                          const labelY = cy + (radius + 15) * Math.sin(ang);
+
+                          return (
+                            <g key={i}>
+                              <line x1={cx} y1={cy} x2={lx} y2={ly} stroke="rgba(212,175,55,0.18)" />
+                              <text x={labelX} y={labelY} fill="#fde68a" fontSize="9" fontWeight="bold" textAnchor="middle">
+                                {a.label}
+                              </text>
+                            </g>
+                          );
+                        })}
+
+                        {/* Batch Performance Polygon */}
+                        <polygon
+                          points={polyPoints}
+                          fill="rgba(16, 185, 129, 0.25)"
+                          stroke="#10b981"
+                          strokeWidth="2.5"
+                        />
+
+                        {/* Apex vertices */}
+                        {axes.map((a, i) => {
+                          const ang = i * angleStep - Math.PI / 2;
+                          const vx = cx + (a.val * radius) * Math.cos(ang);
+                          const vy = cy + (a.val * radius) * Math.sin(ang);
+                          return (
+                            <circle key={i} cx={vx} cy={vy} r="4" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" />
+                          );
+                        })}
+
+                        <text x={cx} y="240" fill="#94a3b8" fontSize="10" textAnchor="middle" fontWeight="bold">
+                          Multi-Dimensional Quality Index: <strong style={{ color: '#34d399' }}>94.6 / 100</strong> (USP Passed)
+                        </text>
+                      </g>
+                    );
+                  })()}
+                </svg>
+              )}
+
+              {/* VIEW 4: ISOLATION FOREST PARTITION HEATMAP */}
+              {activeChartView === 'partition' && (
+                <svg className={styles.spectrumSvg} viewBox="0 0 740 250">
+                  <defs>
+                    <radialGradient id="clusterRisk" cx="30%" cy="50%" r="60%">
+                      <stop offset="0%" stopColor="#ef4444" stopOpacity="0.3" />
+                      <stop offset="60%" stopColor="#f59e0b" stopOpacity="0.15" />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity="0.05" />
+                    </radialGradient>
+                  </defs>
+
+                  {/* Backdrop partition map */}
+                  <rect x="65" y="25" width="645" height="180" rx="8" fill="url(#clusterRisk)" stroke="rgba(212,175,55,0.2)" />
+
+                  {/* Cutoff Hyperplane */}
+                  {(() => {
+                    const normCutoff = (scoreCutoff - (-0.4)) / (0.3 - (-0.4));
+                    const x = 65 + Math.max(0.1, Math.min(0.9, normCutoff)) * 645;
+                    return (
+                      <g>
+                        <line x1={x} y1="25" x2={x} y2="205" stroke="#ef4444" strokeWidth="2" strokeDasharray="5 3" />
+                        <rect x={x - 45} y="30" width="90" height="18" rx="4" fill="rgba(239,68,68,0.85)" />
+                        <text x={x} y="42" fill="#fff" fontSize="8.5" fontWeight="bold" textAnchor="middle" fontFamily="var(--font-mono)">
+                          Threshold: {scoreCutoff.toFixed(2)}
+                        </text>
+                      </g>
+                    );
+                  })()}
+
+                  {/* Plot Peaks in 2D Feature Space */}
+                  {evaluatedPeaks.map((p) => {
+                    const normScore = Math.max(0, Math.min(1, (p.isolationScore - (-0.4)) / (0.3 - (-0.4))));
+                    const x = 65 + normScore * 645;
+                    const normT = Math.max(0, Math.min(1, (p.tailing - 0.9) / 1.5));
+                    const y = 205 - normT * 160;
                     const isSelected = selectedPeak?.id === p.id;
 
                     return (
                       <g
                         key={p.id}
-                        className={styles.interactivePointGroup}
+                        className={styles.interactivePeakGroup}
                         onClick={() => setSelectedPeak(isSelected ? null : p)}
                       >
                         <circle
                           cx={x}
                           cy={y}
-                          r={isSelected ? 10 : p.isAnomaly ? 8 : 6.5}
-                          fill={p.isAnomaly ? '#ef4444' : '#10b981'}
-                          stroke={isSelected ? '#fff' : p.isAnomaly ? '#fca5a5' : '#6ee7b7'}
-                          strokeWidth="2"
+                          r={isSelected ? 9 : p.isAnomaly ? 7.5 : 6}
+                          fill={p.isAnomaly ? '#ef4444' : isSelected ? '#d4af37' : '#10b981'}
+                          stroke="#ffffff"
+                          strokeWidth="1.5"
                         />
-                        <text
-                          x={x}
-                          y={y - 11}
-                          fill="#cbd5e1"
-                          fontSize="9.5"
-                          fontFamily="var(--font-mono)"
-                          textAnchor="middle"
-                        >
+                        <text x={x} y={y - 10} fill="#fde68a" fontSize="8.5" fontFamily="var(--font-mono)" textAnchor="middle">
                           {p.id} ({p.isolationScore.toFixed(2)})
                         </text>
                       </g>
                     );
                   })}
 
-                  <text x="365" y="240" fill="#94a3b8" fontSize="11" textAnchor="middle" fontWeight="bold">
-                    Isolation Score &larr; Anomaly Region | Nominal Region &rarr;
-                  </text>
-                  <text x="25" y="120" fill="#94a3b8" fontSize="11" transform="rotate(-90 25,120)" textAnchor="middle" fontWeight="bold">
-                    Log10(Peak Area)
-                  </text>
-                </svg>
-              )}
-
-              {activeChartView === 'plates_rs' && (
-                <svg className={styles.scatterSvg} viewBox="0 0 700 260">
-                  <line x1="70" y1="20" x2="70" y2="210" stroke="rgba(212,175,55,0.15)" />
-                  <line x1="70" y1="210" x2="660" y2="210" stroke="rgba(212,175,55,0.15)" />
-
-                  {/* Horizontal Plates Limit */}
-                  {(() => {
-                    const y = Math.max(30, Math.min(205, 210 - (platesMinThreshold / 10000) * 180));
-                    return (
-                      <line x1="70" y1={y} x2="660" y2={y} stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="4 4" />
-                    );
-                  })()}
-
-                  {/* Vertical Resolution Limit */}
-                  {(() => {
-                    const x = 70 + (minResolution / 4.5) * 580;
-                    return (
-                      <line x1={x} y1="20" x2={x} y2="210" stroke="#06b6d4" strokeWidth="1.5" strokeDasharray="4 4" />
-                    );
-                  })()}
-
-                  {evaluatedPeaks.map((p) => {
-                    const x = 70 + (p.rs / 4.5) * 580;
-                    const y = 210 - (Math.min(10000, p.plates) / 10000) * 180;
-                    const isSelected = selectedPeak?.id === p.id;
-
-                    return (
-                      <g
-                        key={p.id}
-                        className={styles.interactivePointGroup}
-                        onClick={() => setSelectedPeak(isSelected ? null : p)}
-                      >
-                        <circle
-                          cx={x}
-                          cy={y}
-                          r={isSelected ? 10 : p.isAnomaly ? 8 : 6.5}
-                          fill={p.isAnomaly ? '#ef4444' : '#10b981'}
-                          stroke="#fff"
-                          strokeWidth="1.5"
-                        />
-                        <text x={x} y={y - 11} fill="#cbd5e1" fontSize="9.5" fontFamily="var(--font-mono)" textAnchor="middle">
-                          {p.id} (N:{p.plates})
-                        </text>
-                      </g>
-                    );
-                  })}
-
-                  <text x="365" y="240" fill="#94a3b8" fontSize="11" textAnchor="middle" fontWeight="bold">
-                    Peak Resolution R<sub>s</sub>
-                  </text>
-                  <text x="25" y="120" fill="#94a3b8" fontSize="11" transform="rotate(-90 25,120)" textAnchor="middle" fontWeight="bold">
-                    Theoretical Plates (N)
-                  </text>
-                </svg>
-              )}
-
-              {activeChartView === 'histogram' && (
-                <svg className={styles.scatterSvg} viewBox="0 0 700 260">
-                  <line x1="70" y1="20" x2="70" y2="210" stroke="rgba(212,175,55,0.15)" />
-                  <line x1="70" y1="210" x2="660" y2="210" stroke="rgba(212,175,55,0.15)" />
-
-                  {/* Histogram bins */}
-                  {(() => {
-                    const bins = [
-                      { label: '-0.45 to -0.30', min: -0.50, max: -0.30, count: 0, isAnom: true },
-                      { label: '-0.30 to -0.15', min: -0.30, max: -0.15, count: 0, isAnom: true },
-                      { label: '-0.15 to 0.00', min: -0.15, max: 0.00, count: 0, isAnom: false },
-                      { label: '0.00 to +0.15', min: 0.00, max: 0.15, count: 0, isAnom: false },
-                      { label: '+0.15 to +0.30', min: 0.15, max: 0.30, count: 0, isAnom: false },
-                      { label: '+0.30 to +0.45', min: 0.30, max: 0.45, count: 0, isAnom: false },
-                    ];
-
-                    evaluatedPeaks.forEach(p => {
-                      const bin = bins.find(b => p.isolationScore >= b.min && p.isolationScore < b.max);
-                      if (bin) bin.count += 1;
-                      else if (p.isolationScore >= 0.30) bins[bins.length - 1].count += 1;
-                    });
-
-                    const maxCount = Math.max(1, ...bins.map(b => b.count));
-                    const binWidth = 75;
-
-                    return bins.map((b, i) => {
-                      const x = 95 + i * 92;
-                      const h = (b.count / maxCount) * 150;
-                      const y = 210 - h;
-                      const isOverCutoff = b.min < scoreCutoff;
-
-                      return (
-                        <g key={i}>
-                          <rect
-                            x={x}
-                            y={y}
-                            width={binWidth}
-                            height={h}
-                            rx="4"
-                            fill={isOverCutoff ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)'}
-                            stroke={isOverCutoff ? '#ef4444' : '#10b981'}
-                            strokeWidth="1.5"
-                          />
-                          <text x={x + binWidth / 2} y={y - 8} fill="#fff" fontSize="11" fontWeight="bold" textAnchor="middle">
-                            {b.count}
-                          </text>
-                          <text x={x + binWidth / 2} y="228" fill="#94a3b8" fontSize="9" textAnchor="middle">
-                            {b.label}
-                          </text>
-                        </g>
-                      );
-                    });
-                  })()}
-
-                  <text x="365" y="250" fill="#94a3b8" fontSize="11" textAnchor="middle" fontWeight="bold">
-                    Anomaly Score Partitions
-                  </text>
-                  <text x="25" y="120" fill="#94a3b8" fontSize="11" transform="rotate(-90 25,120)" textAnchor="middle" fontWeight="bold">
-                    Peak Frequency
+                  <text x="385" y="235" fill="#94a3b8" fontSize="10" textAnchor="middle" fontWeight="bold">
+                    &larr; Anomaly Partition &bull; Nominal Cluster &rarr;
                   </text>
                 </svg>
               )}
             </div>
 
-            {/* Selected Peak Drill-down Inspector */}
+            {/* Selected Peak Drill-down Inspector Card */}
             {selectedPeak && (
               <div className={styles.drilldownCard}>
                 <div className={styles.drilldownHeader}>

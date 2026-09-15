@@ -394,7 +394,7 @@
   text-align: right;
 }
 
-/* Right Content Area */
+/* Right Diagnostics Content */
 .diagnosticsContent {
   display: flex;
   flex-direction: column;
@@ -484,41 +484,170 @@
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.2);
 }
 
-/* Scatter / SVG Canvas */
-.scatterContainer {
-  background: radial-gradient(circle at center, rgba(17, 14, 10, 0.9) 0%, rgba(5, 4, 3, 0.95) 100%);
-  border: 1px solid rgba(212, 175, 55, 0.15);
-  border-radius: var(--radius-md, 10px);
-  padding: var(--space-sm);
+/* Modern Spectrum & Waveform Canvas */
+.spectrumCanvasContainer {
+  background: radial-gradient(circle at 50% 30%, rgba(22, 17, 11, 0.95) 0%, rgba(8, 6, 4, 0.98) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: var(--radius-md, 12px);
+  padding: 12px;
   position: relative;
   overflow: hidden;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
 }
 
-.scatterSvg {
+.spectrumSvg {
   width: 100%;
   height: auto;
-  max-height: 280px;
+  max-height: 270px;
 }
 
-.interactivePointGroup {
+.smoothWaveform {
+  filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.3));
+}
+
+.interactivePeakGroup {
   cursor: pointer;
   transition: transform 0.2s ease;
 }
 
-.scatterPoint {
-  transition: r 0.2s ease, fill 0.2s ease;
+.interactivePeakGroup:hover {
+  filter: brightness(1.2);
 }
 
-.pulseHalo {
-  animation: pulse 1.8s infinite ease-in-out;
+.pulseBeacon {
+  animation: beaconPulse 2s infinite ease-in-out;
   transform-origin: center;
 }
 
-@keyframes pulse {
+@keyframes beaconPulse {
   0% { transform: scale(0.9); opacity: 0.8; }
-  50% { transform: scale(1.25); opacity: 0.3; }
+  50% { transform: scale(1.3); opacity: 0.3; }
   100% { transform: scale(0.9); opacity: 0.8; }
 }
+
+/* Suitability Matrix Grid */
+.suitabilityGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 6px;
+}
+
+.suitabilityCard {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.suitabilityCard:hover {
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.35);
+}
+
+.cardAnom {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.cardActive {
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.18) !important;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+}
+
+.scHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+}
+
+.scId {
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  color: #fde68a;
+}
+
+.scName {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  max-width: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badgePassMini, .badgeAnomalyMini {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 9999px;
+}
+
+.badgePassMini {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.badgeAnomalyMini {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.scMetricRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 0.72rem;
+}
+
+.scMetricLabel {
+  color: #94a3b8;
+  font-size: 0.68rem;
+  width: 55px;
+}
+
+.scBarTrack {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  position: relative;
+  overflow: visible;
+}
+
+.scBarFill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.scBarThreshold {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: #f59e0b;
+  box-shadow: 0 0 4px #f59e0b;
+}
+
+.scMetricVal {
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-size: 0.74rem;
+  width: 38px;
+  text-align: right;
+}
+
+.textGreen { color: #34d399; }
+.textCyan { color: #67e8f9; }
 
 /* Drill-Down Inspector Card */
 .drilldownCard {
@@ -785,6 +914,9 @@
   .grid {
     grid-template-columns: 1fr;
   }
+  .suitabilityGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
   .drilldownGrid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -792,6 +924,9 @@
 
 @media (max-width: 700px) {
   .kpiGrid {
+    grid-template-columns: 1fr;
+  }
+  .suitabilityGrid {
     grid-template-columns: 1fr;
   }
 }
