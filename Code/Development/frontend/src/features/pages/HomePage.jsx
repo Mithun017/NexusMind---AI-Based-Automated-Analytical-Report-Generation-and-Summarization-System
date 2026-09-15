@@ -684,7 +684,7 @@ export default function HomePage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {modulatedPreviewRows.slice(0, 300).map((row, rIdx) => (
+                          {modulatedPreviewRows.slice(0, 50).map((row, rIdx) => (
                             <tr key={rIdx}>
                               {row.map((cell, cIdx) => (
                                 <td key={cIdx}>{cell}</td>
@@ -694,9 +694,9 @@ export default function HomePage() {
                         </tbody>
                       </table>
                     </div>
-                    {modulatedPreviewRows.length > 300 && (
+                    {modulatedPreviewRows.length > 50 && (
                       <div className={styles.tableTruncateNote}>
-                        Showing first 300 of {modulatedPreviewRows.length.toLocaleString()} rows &bull; Full dataset will be analyzed
+                        Showing preview sample (50 of {modulatedPreviewRows.length.toLocaleString()} rows) &bull; Scroll to inspect &bull; Full dataset will be analyzed
                       </div>
                     )}
                   </>
