@@ -7,8 +7,6 @@ import HistoryPage from './features/pages/HistoryPage';
 import GraphPage from './features/pages/GraphPage';
 import DiagnosticsPage from './features/pages/DiagnosticsPage';
 import ModelsPage from './features/pages/ModelsPage';
-import AuditPage from './features/pages/AuditPage';
-import DocsPage from './features/pages/DocsPage';
 import ReportPage from './features/pages/ReportPage';
 
 export default function App() {
@@ -29,8 +27,6 @@ export default function App() {
 
         {/* Intelligence & System */}
         <Route path="/models" element={<ModelsPage />} />
-        <Route path="/audit" element={<AuditPage />} />
-        <Route path="/docs" element={<DocsPage />} />
 
         {/* Reports */}
         <Route path="/report/:reportId" element={<ReportPage />} />

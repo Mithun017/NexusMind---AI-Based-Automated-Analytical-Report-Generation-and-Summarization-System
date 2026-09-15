@@ -11,8 +11,6 @@ const ROUTE_MAP = {
   '/graph': { title: 'Knowledge Graph Explorer', section: 'Advanced Analytics' },
   '/diagnostics': { title: 'ML Anomaly & Diagnostics', section: 'Advanced Analytics' },
   '/models': { title: 'AI Model Hub & Router', section: 'Intelligence & System' },
-  '/audit': { title: 'Audit Trail & 21 CFR Compliance', section: 'Intelligence & System' },
-  '/docs': { title: 'Pipeline Docs & API Reference', section: 'Intelligence & System' },
 };
 
 export default function Navbar({ onToggleSidebar }) {

@@ -7,8 +7,6 @@ import {
   Share2,
   AlertTriangle,
   Cpu,
-  ShieldCheck,
-  BookOpen,
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
@@ -36,8 +34,6 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
       shortTitle: 'INTEL',
       items: [
         { to: '/models', label: 'AI Model Hub', icon: Cpu, badge: 'LLM' },
-        { to: '/audit', label: 'Audit & Compliance', icon: ShieldCheck, badge: '21 CFR' },
-        { to: '/docs', label: 'Pipeline Docs & API', icon: BookOpen },
       ],
     },
   ];
